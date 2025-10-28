@@ -15,9 +15,6 @@ const authControllers = {
             const accessToken = jwt.accessToken({ data: payload })
             const refreshToken = jwt.refreshToken({ data: payload })
 
-            user.refreshToken = refreshToken;
-            await user.save()
-
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
                 secure: config.node_env === "production",           // send only via HTTP
@@ -25,6 +22,7 @@ const authControllers = {
                 path: "/",
                 maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
             })
+
             return res.status(200).json({
                 success: true,
                 message: 'Login successfully.',
@@ -43,9 +41,6 @@ const authControllers = {
             const payload = jwt.jwtEncrypt({ id: user._id })
             const accessToken = jwt.accessToken({ data: payload })
             const refreshToken = jwt.refreshToken({ data: payload })
-
-            user.refreshToken = refreshToken;
-            await user.save()
 
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
@@ -70,21 +65,18 @@ const authControllers = {
 
     handleRefresh: async (req, res) => {
         try {
-            const token = req.cookies.refreshToken;
+            const token = req.cookies?.refreshToken;
+
             if (!token) return res.status(401).json({ success: false, message: "No token" })
 
-            const user = jwt.verifyToken(token)
+            const user = jwt.verifyToken(token, config.jwt_refresh_key)
             const decoded = jwt.jwtDecrypt(user.data)
 
             const response = await adminModel.findById({ _id: decoded.id })
-            if (!response || response.refreshToken !== token) res.status(403).json({ message: "Invalid refresh token" })
 
             const payload = jwt.jwtEncrypt({ id: response._id })
             const accessToken = jwt.accessToken({ data: payload })
             const newRefresh = jwt.refreshToken({ data: payload })
-
-            user.refreshToken = newRefresh;
-            await user.save()
 
             res.cookie("refreshToken", newRefresh, {
                 httpOnly: true,
@@ -94,7 +86,7 @@ const authControllers = {
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
 
-            return res.status(200).json({ accessToken })
+            return res.status(200).json({ success: true, accessToken })
         } catch (error) {
             console.log('handleRefresh : ' + error.message)
             return res.status(403).json({ success: false, message: "Invalid token" })

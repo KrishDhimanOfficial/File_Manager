@@ -31,9 +31,6 @@ const adminSchema = new mongoose.Schema({
     profile: {
         type: String,
     },
-    refreshToken: {
-        type: String,
-    }
 },
     { timestamps: true }
 )

@@ -8,6 +8,7 @@ interface AuthContextType {
     signup: (email: string, password: string, name: string) => Promise<{ success: boolean; message?: string }>
     logout: () => void
     isLoading: boolean
+    authicated: boolean
 }
 
 function isTokenExpired(token: string | null): boolean {
@@ -25,12 +26,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<string | null>(null)
+    const [authicated, setAuthenticated] = useState<boolean | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 
     async function handleRefreshToken() {
         const response = await Fetch.get('/auth/refresh')
         setUser(response.accessToken)
-        Cookies.set('fileManager_token', response.accessToken, { secure: true, sameSite: 'Strict' })
+        Cookies.set('fileManager_token', response.accessToken)
+
+        if (response.success) setAuthenticated(true)
+        else setAuthenticated(false)
+        return
     }
 
     useEffect(() => {
@@ -45,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const login = async (email: string, password: string) => {
         const response = await Fetch.post('/auth/login', { email, password })
         setUser(response.accessToken)
-        Cookies.set('fileManager_token', response.accessToken, { secure: true, sameSite: 'Strict' })
+        Cookies.set('fileManager_token', response.accessToken)
         return response
     }
 
@@ -63,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     return (
-        <AuthContext.Provider value={{ user, login, signup, logout, isLoading }}>
+        <AuthContext.Provider value={{ authicated, user, login, signup, logout, isLoading }}>
             {children}
         </AuthContext.Provider>
     )

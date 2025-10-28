@@ -15,7 +15,7 @@ const jwt = {
         if (!payload || typeof payload !== 'object') throw new Error('Payload must be an object')
         return JsonWebToken.sign(payload, config.jwt_key, {
             algorithm: 'HS256',
-            expiresIn: '15m'
+            expiresIn: '1m'
         })
     },
 
@@ -27,8 +27,8 @@ const jwt = {
         })
     },
 
-    verifyToken: (token) => {
-        return JsonWebToken.verify(token, config.jwt_key)
+    verifyToken: (token, key) => {
+        return JsonWebToken.verify(token, key)
     },
 
     jwtEncrypt: (data) => {

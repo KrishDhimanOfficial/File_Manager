@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { toast } from 'sonner'
+import Fetch from './Fetch'
 
 export interface FileItem {
     id: string
@@ -57,8 +58,10 @@ export const useFileManager = () => {
     const [currentFolder, setCurrentFolder] = useState<string | null>(null)
     const [selectedItems, setSelectedItems] = useState<string[]>([])
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+    const createFolder = useCallback(async (name: string, parentId: string | null = null) => {
+        const res = await Fetch.post('/folder', { name, parentId, type: 'folder' })
+        console.log(res);
 
-    const createFolder = useCallback((name: string, parentId: string | null = null) => {
         const newFolder: FileItem = {
             id: Date.now().toString(),
             name,

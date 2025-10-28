@@ -39,7 +39,7 @@ const Files = () => {
         handleContextMenu,
         closeMenu,
     } = useContextMenu();
-
+    const [names, setNames] = useState(['dfgs', 'erwt','ewrt'])
     const [searchQuery, setSearchQuery] = useState('');
     const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
     const [isNewFolderDialogOpen, setIsNewFolderDialogOpen] = useState(false);
