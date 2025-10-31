@@ -22,6 +22,7 @@ const menuItems = [
   { title: 'Files', url: '/files', icon: FolderOpen },
   { title: 'Folders', url: '/folders', icon: Folders },
   { title: 'Analytics', url: '/analytics', icon: BarChart3 },
+  { title: 'Trash', url: '/trash', icon: FolderOpen },
   { title: 'Settings', url: '/settings', icon: SettingsIcon },
 ];
 
@@ -89,7 +90,7 @@ export const FileManagerSidebar = () => {
         <div className="space-y-2">
           {!isCollapsed && user && (
             <div className="text-sm text-muted-foreground mb-2 px-2">
-              {user.name}
+              {/* {user.name} */}
             </div>
           )}
           <Button

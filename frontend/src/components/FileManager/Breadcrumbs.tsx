@@ -20,13 +20,16 @@ export const Breadcrumbs = ({ breadcrumbs, onNavigate }: BreadcrumbsProps) => {
                 <span>Home</span>
             </Button>
 
-            {breadcrumbs.map((crumb) => (
-                <div key={crumb.id} className="flex items-center gap-1">
+            {breadcrumbs.map((crumb, i) => (
+                <div key={i} className="flex items-center gap-1">
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onNavigate(crumb.id)}
+                        onClick={() => {
+                            onNavigate(crumb.id)
+                            console.log(crumb.id);
+                        }}
                         className="h-8"
                     >
                         {crumb.name}

@@ -3,6 +3,7 @@ import path from 'node:path'
 import fs from 'node:fs'
 import config from '../config/config.js'
 import { deleteFile, } from '../utils/removeFile.utils.js'
+import folderModel from '../models/folder.model.js'
 
 const createStorage = (dir) => {
     const uploadPath = path.join('uploads', dir)
@@ -99,6 +100,44 @@ export const rendermulterError = (err, req, res, next) => {
 
 export const upload = (folder = '') => {
     return multer({ storage: createStorage(folder), fileFilter })
+}
+
+export const createNestedFolders = async (folder = '', parentId) => {
+    if (!parentId) {
+        upload(folder)
+        return `uploads/${folder}`
+    }
+
+    const parentFolder = await folderModel.findById({ _id: parentId })
+    const path = await findRelativePath(parentFolder.name)
+    
+    fs.promises.mkdir(`${path}/${folder}`, { recursive: true })
+    return `${path}/${folder}`
+}
+
+export const findRelativePath = async (targetFolder) => {
+    let result = null;
+    const baseDir = path.resolve('uploads')
+
+    function search(currentDir, relativePath) {
+        const items = fs.readdirSync(currentDir, { withFileTypes: true })
+
+        for (const item of items) {
+            if (item.isDirectory()) {
+                const newRelativePath = path.join(relativePath, item.name)
+
+                if (item.name === targetFolder) {
+                    result = newRelativePath
+                    return
+                }
+
+                search(path.join(currentDir, item.name), newRelativePath)
+            }
+        }
+    }
+
+    search(baseDir, '')
+    return `uploads/${result}`
 }
 
 export const uploadHandler = (config) => {

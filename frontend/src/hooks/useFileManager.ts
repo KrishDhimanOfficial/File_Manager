@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { toast } from 'sonner'
 import Fetch from './Fetch'
+import { useContextMenu } from './useContextMenu'
 
 export interface FileItem {
     id: string
@@ -10,7 +11,7 @@ export interface FileItem {
     size?: number
     extension?: string
     createdAt: Date
-    modifiedAt: Date
+    updatedAt: Date
     content?: string // For text files
 }
 
@@ -22,7 +23,7 @@ const initialFiles: FileItem[] = [
         type: 'folder',
         parentId: null,
         createdAt: new Date('2024-01-01'),
-        modifiedAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01'),
     },
     {
         id: '2',
@@ -30,7 +31,7 @@ const initialFiles: FileItem[] = [
         type: 'folder',
         parentId: null,
         createdAt: new Date('2024-01-02'),
-        modifiedAt: new Date('2024-01-02'),
+        updatedAt: new Date('2024-01-02'),
     },
     {
         id: '3',
@@ -38,7 +39,7 @@ const initialFiles: FileItem[] = [
         type: 'folder',
         parentId: null,
         createdAt: new Date('2024-01-03'),
-        modifiedAt: new Date('2024-01-03'),
+        updatedAt: new Date('2024-01-03'),
     },
     {
         id: '4',
@@ -48,32 +49,65 @@ const initialFiles: FileItem[] = [
         size: 1024,
         extension: 'md',
         createdAt: new Date('2024-01-04'),
-        modifiedAt: new Date('2024-01-04'),
+        updatedAt: new Date('2024-01-04'),
         content: '# Welcome to File Manager\n\nThis is a modern file management application.',
     },
 ]
 
 export const useFileManager = () => {
-    const [files, setFiles] = useState<FileItem[]>(initialFiles)
+    const [files, setFiles] = useState([])
     const [currentFolder, setCurrentFolder] = useState<string | null>(null)
     const [selectedItems, setSelectedItems] = useState<string[]>([])
+    const [breadcumbs, setbreadcumbs] = useState<Array<any>>([])
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-    const createFolder = useCallback(async (name: string, parentId: string | null = null) => {
-        const res = await Fetch.post('/folder', { name, parentId, type: 'folder' })
-        console.log(res);
 
-        const newFolder: FileItem = {
-            id: Date.now().toString(),
-            name,
-            type: 'folder',
-            parentId: parentId || currentFolder,
-            createdAt: new Date(),
-            modifiedAt: new Date(),
-        }
-        setFiles(prev => [...prev, newFolder])
-        toast.success(`Folder "${name}" created successfully`)
-        return newFolder
+    const createFolder = useCallback(async (name: string, parentId: string | null = null) => {
+        // console.log(name, parentId, currentFolder);
+        const res = await Fetch.post('/folder', { name, parentId: parentId || currentFolder, type: 'folder' })
+        // console.log(res);
+
+        // const newFolder: FileItem = {
+        //     id: Date.now().toString(),
+        //     name,
+        //     type: 'folder',
+        //     parentId: parentId || currentFolder,
+        //     createdAt: new Date(),
+        //     updatedAt: new Date(),
+        // }
+
+        setFiles(prev => [...prev, res.folder])
+        res.success ? toast.success(`Folder "${name}" created successfully`) : toast.error(res.message)
+        return res.folder
     }, [currentFolder])
+
+    const handleFolders = useCallback(async () => {
+        try {
+            const res = currentFolder
+                ? await Fetch.get(`/folders/${currentFolder}`)
+                : await Fetch.get(`/folders`)
+
+            setFiles(res), setbreadcumbs([])
+
+            if (currentFolder) {
+                const u: Array<any> = res[0].path.split('/')
+                u.shift()
+                u.pop()
+
+                const base = u?.map((folder: any) => {
+                    return {
+                        name: folder,
+                        id: res[0].parentId
+                    }
+                })
+                setbreadcumbs(base)
+            }
+        } catch (error) {
+            console.error(error);
+        }
+
+    }, [currentFolder])
+
+    useEffect(() => { handleFolders() }, [currentFolder, handleFolders])
 
     const uploadFile = useCallback((file: File, parentId: string | null = null) => {
         const newFile: FileItem = {
@@ -84,36 +118,30 @@ export const useFileManager = () => {
             size: file.size,
             extension: file.name.split('.').pop(),
             createdAt: new Date(),
-            modifiedAt: new Date(),
+            updatedAt: new Date(),
         }
         setFiles(prev => [...prev, newFile])
         toast.success(`File "${file.name}" uploaded successfully`)
         return newFile
     }, [currentFolder])
 
-
-    const deleteItems = useCallback((itemIds: string[]) => {
-        const deleteRecursive = (id: string): string[] => {
-            const item = files.find(f => f.id === id)
-            if (!item) return [id]
-
-            if (item.type === 'folder') {
-                const children = files.filter(f => f.parentId === id)
-                return [id, ...children.flatMap(child => deleteRecursive(child.id))]
-            }
-            return [id]
+    const trashItems = useCallback(async (id: string, isTrash: boolean) => {
+        try {
+            const res = await Fetch.patch(`/folder/${id}`, { isTrash })
+            res.success && handleFolders()
+            res.success
+                ? toast.success(res.success)
+                : toast.error(res.error)
+        } catch (error) {
+            console.error(error)
         }
+    }, [handleFolders])
 
-        const allIdsToDelete = itemIds.flatMap(deleteRecursive)
-        setFiles(prev => prev.filter(f => !allIdsToDelete.includes(f.id)))
-        setSelectedItems([])
-        toast.success(`${itemIds.length} item(s) deleted successfully`)
-    }, [files])
 
     const renameItem = useCallback((itemId: string, newName: string) => {
         setFiles(prev => prev.map(f =>
             f.id === itemId
-                ? { ...f, name: newName, modifiedAt: new Date() }
+                ? { ...f, name: newName, updatedAt: new Date() }
                 : f
         ))
         toast.success('Item renamed successfully')
@@ -122,7 +150,7 @@ export const useFileManager = () => {
     const moveItems = useCallback((itemIds: string[], targetFolderId: string | null) => {
         setFiles(prev => prev.map(f =>
             itemIds.includes(f.id)
-                ? { ...f, parentId: targetFolderId, modifiedAt: new Date() }
+                ? { ...f, parentId: targetFolderId, updatedAt: new Date() }
                 : f
         ))
         toast.success(`${itemIds.length} item(s) moved successfully`)
@@ -136,13 +164,6 @@ export const useFileManager = () => {
         return files.find(f => f.id === itemId)
     }, [files])
 
-    const getBreadcrumbs = useCallback((folderId: string | null): FileItem[] => {
-        if (!folderId) return []
-        const folder = files.find(f => f.id === folderId)
-        if (!folder) return []
-        return [...getBreadcrumbs(folder.parentId), folder]
-    }, [files])
-
     return {
         files,
         currentFolder,
@@ -153,11 +174,11 @@ export const useFileManager = () => {
         setViewMode,
         createFolder,
         uploadFile,
-        deleteItems,
+        trashItems,
         renameItem,
         moveItems,
         getItemsByFolder,
         getItemById,
-        getBreadcrumbs,
+        breadcumbs,
     }
 }

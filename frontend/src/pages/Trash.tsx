@@ -15,7 +15,7 @@ import { FileItem } from '@/hooks/useFileManager';
 import { toast } from 'sonner';
 import Fetch from '@/hooks/Fetch';
 
-const Files = () => {
+const Trash = () => {
     const {
         files,
         currentFolder,
@@ -25,14 +25,12 @@ const Files = () => {
         viewMode,
         setViewMode,
         createFolder,
-        uploadFile,
         trashItems,
-        // deleteItems: handleDelete,
+        uploadFile,
         renameItem,
         moveItems,
         getItemsByFolder,
         breadcumbs
-        // getBreadcrumbs,
     } = useFileManager();
 
     const {
@@ -108,55 +106,54 @@ const Files = () => {
     }
 
     // Handle dropping files
-    function handleFileDrop(files: File[]) {
-        for (let i = 0; i < files.length; i++) {
-            uploadFile(files[i]);
-        }
-    }
+    // function handleFileDrop(files: File[]) {
+    //     for (let i = 0; i < files.length; i++) {
+    //         uploadFile(files[i]);
+    //     }
+    // }
 
-    // Handle delete button click
     async function updateTrash() {
-        contextMenuTargetId && trashItems(contextMenuTargetId, true)
+        contextMenuTargetId && trashItems(contextMenuTargetId, false)
     }
 
     // Handle rename button click
-    function handleRename() {
-        let itemId = contextMenuTargetId;
-        if (!itemId && selectedItems.length > 0) {
-            itemId = selectedItems[0];
-        }
+    // function handleRename() {
+    //     let itemId = contextMenuTargetId;
+    //     if (!itemId && selectedItems.length > 0) {
+    //         itemId = selectedItems[0];
+    //     }
 
-        if (itemId) {
-            const newName = prompt('Enter new name:');
-            if (newName) {
-                renameItem(itemId, newName);
-            }
-        }
-    }
+    //     if (itemId) {
+    //         const newName = prompt('Enter new name:');
+    //         if (newName) {
+    //             renameItem(itemId, newName);
+    //         }
+    //     }
+    // }
 
     // Handle move button click
-    function handleMoveClick() {
-        setIsMoveDialogOpen(true);
-    }
+    // function handleMoveClick() {
+    //     setIsMoveDialogOpen(true);
+    // }
 
-    // Handle confirming the move
-    function handleMoveConfirm(targetFolderId: string | null) {
-        let itemsToMove: string[] = [];
+    // // Handle confirming the move
+    // function handleMoveConfirm(targetFolderId: string | null) {
+    //     let itemsToMove: string[] = [];
 
-        if (contextMenuTargetId) {
-            itemsToMove = [contextMenuTargetId];
-        } else {
-            itemsToMove = selectedItems;
-        }
+    //     if (contextMenuTargetId) {
+    //         itemsToMove = [contextMenuTargetId];
+    //     } else {
+    //         itemsToMove = selectedItems;
+    //     }
 
-        if (itemsToMove.length > 0) {
-            moveItems(itemsToMove, targetFolderId);
-            setSelectedItems([]);
-        }
-    }
+    //     if (itemsToMove.length > 0) {
+    //         moveItems(itemsToMove, targetFolderId);
+    //         setSelectedItems([]);
+    //     }
+    // }
 
-    // Get all folders for the move dialog
-    const allFolders = files.filter(item => item.type === 'folder');
+    // // // Get all folders for the move dialog
+    // const allFolders = files.filter(item => item.type === 'folder');
 
     return (
         <div className="flex flex-col h-screen" onDragOver={(e) => e.preventDefault()}>
@@ -201,20 +198,20 @@ const Files = () => {
             <ContextMenu
                 isOpen={isContextMenuOpen}
                 position={contextMenuPosition}
-                onClose={closeMenu}
-                onRename={handleRename}
+                // onClose={closeMenu}
+                // onRename={handleRename}
                 onDelete={updateTrash}
-                onMove={handleMoveClick}
-                onView={() => {
-                    const item = contextMenuTargetId
-                        ? currentItems.find(i => i.id === contextMenuTargetId)
-                        : null;
-                    if (item?.type === 'file') {
-                        setPreviewFile(item);
-                    }
-                }}
+                // onMove={handleMoveClick}
+                // onView={() => {
+                //     const item = contextMenuTargetId
+                //         ? currentItems.find(i => i.id === contextMenuTargetId)
+                //         : null;
+                //     if (item?.type === 'file') {
+                //         setPreviewFile(item);
+                //     }
+                // }}
             />
-
+{/* 
             <FilePreviewModal
                 file={previewFile}
                 isOpen={!!previewFile}
@@ -235,7 +232,7 @@ const Files = () => {
                 currentItemIds={contextMenuTargetId ? [contextMenuTargetId] : selectedItems}
             />
 
-            <UploadDropzone onUpload={handleFileDrop} />
+            <UploadDropzone onUpload={handleFileDrop} /> */}
 
             <FloatingActionButton
                 onNewFolder={() => setIsNewFolderDialogOpen(true)}
@@ -253,4 +250,4 @@ const Files = () => {
     );
 };
 
-export default Files;
+export default Trash;

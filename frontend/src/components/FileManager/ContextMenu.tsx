@@ -12,10 +12,10 @@ import {
 interface ContextMenuProps {
   isOpen: boolean;
   position: { x: number; y: number };
-  onClose: () => void;
-  onRename: () => void;
-  onDelete: () => void;
-  onMove: () => void;
+  onClose?: () => void;
+  onRename?: () => void;
+  onDelete?: () => void;
+  onMove?: () => void;
   onView?: () => void;
 }
 
@@ -116,7 +116,7 @@ export const ContextMenu = ({
           className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors text-destructive hover:bg-destructive/10"
         >
           <Trash2 className="h-4 w-4" />
-          <span>Delete</span>
+          <span>Trash</span>
         </button>
       </div>
     </motion.div>

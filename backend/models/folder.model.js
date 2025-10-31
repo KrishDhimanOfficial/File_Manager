@@ -14,14 +14,23 @@ const folderSchema = new mongoose.Schema({
         type: String,
         enum: ['folder', 'file'],
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
+    path: {
+        type: String
     },
-    modifiedAt: {
-        type: Date,
-        default: Date.now
+    isTrash: {
+        type: Boolean,
+        default: false
     }
+},
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true },
+        timestamps: true
+    })
+
+// ✅ Create a virtual property "id" from "_id"
+folderSchema.virtual('id').get(function () {
+    return this._id.toHexString()
 })
 
 export default mongoose.model('folder', folderSchema)

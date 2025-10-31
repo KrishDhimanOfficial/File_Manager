@@ -22,7 +22,7 @@ const Folders = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {folders.map((folder, index) => {
+                    {folders?.map((folder, index) => {
                         const itemCount = getFolderItemCount(folder.id);
                         return (
                             <motion.div
@@ -56,7 +56,7 @@ const Folders = () => {
                                     </CardHeader>
                                     <CardContent>
                                         <p className="text-sm text-muted-foreground">
-                                            Modified {formatDate(folder.modifiedAt)}
+                                            Modified {formatDate(new Date(folder?.updatedAt))}
                                         </p>
                                     </CardContent>
                                 </Card>

@@ -48,6 +48,8 @@ export const FileList = ({
   onContextMenu,
   selectedItems,
 }: FileListProps) => {
+  console.log(items);
+  
   return (
     <div className="p-6">
       <Table>
@@ -89,7 +91,7 @@ export const FileList = ({
                   {item.type === 'file' && item.size ? formatBytes(item.size) : '—'}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {formatDate(item.modifiedAt)}
+                  {formatDate(new Date(item.updatedAt))}
                 </TableCell>
                 <TableCell>
                   <MoreVertical className="h-4 w-4 text-muted-foreground" />

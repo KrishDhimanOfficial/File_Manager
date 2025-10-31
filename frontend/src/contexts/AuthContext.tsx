@@ -15,9 +15,11 @@ function isTokenExpired(token: string | null): boolean {
     try {
         const payload = JSON.parse(atob(token.split('.')[1]))
         const currentTime = Math.floor(Date.now() / 1000)
+        console.log(new Date(payload.exp * 1000) );
 
         return payload.exp < currentTime;
     } catch (error) {
+        console.error(error)
         return true // Treat invalid tokens as expired
     }
 }
@@ -26,17 +28,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<string | null>(null)
-    const [authicated, setAuthenticated] = useState<boolean | null>(null)
+    const [authicated, setAuthenticated] = useState<boolean>(false)
     const [isLoading, setIsLoading] = useState(true)
 
-    async function handleRefreshToken() {
+    const handleRefreshToken = async () => {
         const response = await Fetch.get('/auth/refresh')
-        setUser(response.accessToken)
         Cookies.set('fileManager_token', response.accessToken)
 
-        if (response.success) setAuthenticated(true)
-        else setAuthenticated(false)
-        return
+        if (response.success) setUser(response.accessToken)
+        else setUser(null)
     }
 
     useEffect(() => {
