@@ -89,7 +89,7 @@ export const useFileManager = () => {
             setFiles(res), setbreadcumbs([])
 
             if (currentFolder) {
-                const u: Array<any> = res[0].path.split('/')
+                const u: Array<any> = res[0]?.path.split('/')
                 u.shift()
                 u.pop()
 
@@ -106,6 +106,19 @@ export const useFileManager = () => {
         }
 
     }, [currentFolder])
+
+    const trashItems = useCallback(async (id: string, isTrash: boolean) => {
+        try {
+            const res = await Fetch.patch(`/folder/${id}`, { isTrash })
+            res.success && await handleFolders()
+
+            res.success
+                ? toast.success(res.success)
+                : toast.error(res.error)
+        } catch (error) {
+            console.error(error)
+        }
+    }, [handleFolders])
 
     useEffect(() => { handleFolders() }, [currentFolder, handleFolders])
 
@@ -124,18 +137,6 @@ export const useFileManager = () => {
         toast.success(`File "${file.name}" uploaded successfully`)
         return newFile
     }, [currentFolder])
-
-    const trashItems = useCallback(async (id: string, isTrash: boolean) => {
-        try {
-            const res = await Fetch.patch(`/folder/${id}`, { isTrash })
-            res.success && handleFolders()
-            res.success
-                ? toast.success(res.success)
-                : toast.error(res.error)
-        } catch (error) {
-            console.error(error)
-        }
-    }, [handleFolders])
 
 
     const renameItem = useCallback((itemId: string, newName: string) => {
@@ -156,9 +157,13 @@ export const useFileManager = () => {
         toast.success(`${itemIds.length} item(s) moved successfully`)
     }, [])
 
-    const getItemsByFolder = useCallback((folderId: string | null) => {
-        return files.filter(f => f.parentId === folderId)
-    }, [files])
+    const getItemsByFolder = useCallback(
+        (folderId: string | null, { isTrash = false }: { isTrash?: boolean } = {}) => {
+            return files.filter(f => f.parentId === folderId && f.isTrash === isTrash);
+        },
+        [files]
+    );
+
 
     const getItemById = useCallback((itemId: string) => {
         return files.find(f => f.id === itemId)

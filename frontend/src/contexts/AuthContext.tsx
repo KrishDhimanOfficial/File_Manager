@@ -15,7 +15,7 @@ function isTokenExpired(token: string | null): boolean {
     try {
         const payload = JSON.parse(atob(token.split('.')[1]))
         const currentTime = Math.floor(Date.now() / 1000)
-        console.log(new Date(payload.exp * 1000) );
+        console.log(new Date(payload.exp * 1000));
 
         return payload.exp < currentTime;
     } catch (error) {
@@ -40,10 +40,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     useEffect(() => {
-        const storedToken = Cookies.get('fileManager_token')
+        setUser('grfvteb')
+        // const storedToken = Cookies.get('fileManager_token')
 
-        if (isTokenExpired(storedToken)) handleRefreshToken()
-        else setUser(storedToken)
+        // if (isTokenExpired(storedToken)) handleRefreshToken()
+        // else setUser(storedToken)
 
         setIsLoading(false)
     }, [])

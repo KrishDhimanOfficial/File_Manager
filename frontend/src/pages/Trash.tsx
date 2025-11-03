@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useFileManager } from '@/hooks/useFileManager';
 import { useContextMenu } from '@/hooks/useContextMenu';
 import { FileToolbar } from '@/components/FileManager/FileToolbar';
@@ -14,6 +14,8 @@ import { FloatingActionButton } from '@/components/FileManager/FloatingActionBut
 import { FileItem } from '@/hooks/useFileManager';
 import { toast } from 'sonner';
 import Fetch from '@/hooks/Fetch';
+import { useQuery } from '@tanstack/react-query';
+import AlertBox from '@/components/FileManager/AlertBox';
 
 const Trash = () => {
     const {
@@ -40,13 +42,20 @@ const Trash = () => {
         handleContextMenu,
         closeMenu,
     } = useContextMenu();
-    const [searchQuery, setSearchQuery] = useState('');
-    const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
-    const [isNewFolderDialogOpen, setIsNewFolderDialogOpen] = useState(false);
-    const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [searchQuery, setSearchQuery] = useState('')
+    const { data: trashfiles, refetch } = useQuery({
+        queryKey: ['trash-folders'],
+        queryFn: async () => await Fetch.get(`/trash/folders`),
+    })
+    const [targetId, setTargetId] = useState<string | null>(null)
+    const [previewFile, setPreviewFile] = useState<FileItem | null>(null)
+    const [isAlertOpen, setIsAlertOpen] = useState(false)
+    const [isNewFolderDialogOpen, setIsNewFolderDialogOpen] = useState(false)
+    const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const currentItems = getItemsByFolder(currentFolder);
+    const currentItems = getItemsByFolder(currentFolder, { isTrash: true })
+
     const filteredItems = searchQuery
         ? currentItems.filter(item =>
             item.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -71,14 +80,16 @@ const Trash = () => {
 
     // Handle double clicking an item (open folder or preview file)
     function handleItemDoubleClick(item: FileItem) {
-        if (item.type === 'folder') {
-            // Open the folder
-            setCurrentFolder(item.id);
-            setSelectedItems([]);
-        } else {
-            // Preview the file
-            setPreviewFile(item);
-        }
+        setTargetId(item.id)
+        setIsAlertOpen(!isAlertOpen)
+        // if (item.type === 'folder') {
+        //     // Open the folder
+        //     setCurrentFolder(item.id);
+        //     setSelectedItems([]);
+        // } else {
+        //     // Preview the file
+        //     setPreviewFile(item);
+        // }
     }
 
     // Handle upload button click
@@ -112,8 +123,10 @@ const Trash = () => {
     //     }
     // }
 
-    async function updateTrash() {
-        contextMenuTargetId && trashItems(contextMenuTargetId, false)
+    async function restoredTrash() {
+        targetId && trashItems(targetId, false)
+        refetch()
+        return
     }
 
     // Handle rename button click
@@ -157,6 +170,15 @@ const Trash = () => {
 
     return (
         <div className="flex flex-col h-screen" onDragOver={(e) => e.preventDefault()}>
+            <AlertBox
+                title="In trash"
+                desc="To open this, restore it first."
+                open={isAlertOpen}
+                onOpenChange={() => setIsAlertOpen(!isAlertOpen)}
+                onCancel={() => setIsAlertOpen(!isAlertOpen)}
+                onContinue={restoredTrash}
+            />
+
             <FileToolbar
                 viewMode={viewMode}
                 onViewModeChange={setViewMode}
@@ -171,14 +193,14 @@ const Trash = () => {
             />
 
             <div className="flex-1 overflow-auto">
-                {filteredItems.length === 0 ? (
+                {trashfiles?.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
                         <p className="text-lg">No files or folders</p>
                         <p className="text-sm">Create a new folder or upload files to get started</p>
                     </div>
                 ) : viewMode === 'grid' ? (
                     <FileGrid
-                        items={filteredItems}
+                        items={trashfiles}
                         onItemClick={handleItemClick}
                         onItemDoubleClick={handleItemDoubleClick}
                         onContextMenu={(e, item) => handleContextMenu(e, item.id)}
@@ -186,7 +208,7 @@ const Trash = () => {
                     />
                 ) : (
                     <FileList
-                        items={filteredItems}
+                        items={trashfiles}
                         onItemClick={handleItemClick}
                         onItemDoubleClick={handleItemDoubleClick}
                         onContextMenu={(e, item) => handleContextMenu(e, item.id)}
@@ -195,23 +217,24 @@ const Trash = () => {
                 )}
             </div>
 
-            <ContextMenu
+            {/* <ContextMenu
                 isOpen={isContextMenuOpen}
+                visible={{ delete: true }}
                 position={contextMenuPosition}
-                // onClose={closeMenu}
+                onClose={closeMenu}
                 // onRename={handleRename}
                 onDelete={updateTrash}
                 // onMove={handleMoveClick}
-                // onView={() => {
-                //     const item = contextMenuTargetId
-                //         ? currentItems.find(i => i.id === contextMenuTargetId)
-                //         : null;
-                //     if (item?.type === 'file') {
-                //         setPreviewFile(item);
-                //     }
-                // }}
-            />
-{/* 
+                onView={() => {
+                    const item = contextMenuTargetId
+                        ? currentItems.find(i => i.id === contextMenuTargetId)
+                        : null;
+                    if (item?.type === 'file') {
+                        setPreviewFile(item);
+                    }
+                }}
+            /> */}
+            {/* 
             <FilePreviewModal
                 file={previewFile}
                 isOpen={!!previewFile}

@@ -8,6 +8,7 @@ import {
   FolderInput,
   Eye,
 } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 interface ContextMenuProps {
   isOpen: boolean;
@@ -17,6 +18,15 @@ interface ContextMenuProps {
   onDelete?: () => void;
   onMove?: () => void;
   onView?: () => void;
+  visible?: {
+    rename?: boolean;
+    delete?: boolean;
+    move?: boolean;
+    view?: boolean;
+    copy?: boolean;
+    download?: boolean;
+    cut?: boolean;
+  };
 }
 
 export const ContextMenu = ({
@@ -27,7 +37,17 @@ export const ContextMenu = ({
   onDelete,
   onMove,
   onView,
+  visible = {
+    rename: true,
+    delete: true,
+    move: true,
+    view: true,
+    copy: true,
+    download: true,
+    cut: true,
+  },
 }: ContextMenuProps) => {
+  const location = useLocation()
   // Simple function to handle clicking a menu item
   function handleMenuClick(action: (() => void) | undefined) {
     if (action) {
@@ -55,7 +75,7 @@ export const ContextMenu = ({
     >
       <div className="p-1">
         {/* View button - only show if onView is provided */}
-        {onView && (
+        {(onView && visible.view) && (
           <button
             onClick={() => handleMenuClick(onView)}
             className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
@@ -66,58 +86,82 @@ export const ContextMenu = ({
         )}
 
         {/* Rename button */}
-        <button
-          onClick={() => handleMenuClick(onRename)}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-        >
-          <Edit className="h-4 w-4" />
-          <span>Rename</span>
-        </button>
+        {
+          visible.rename && (
+            <button
+              onClick={() => handleMenuClick(onRename)}
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+            >
+              <Edit className="h-4 w-4" />
+              <span>Rename</span>
+            </button>
+          )
+        }
 
         {/* Copy button */}
-        <button
-          onClick={() => handleMenuClick(undefined)}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-        >
-          <Copy className="h-4 w-4" />
-          <span>Copy</span>
-        </button>
+        {visible.copy && (
+          <button
+            onClick={() => handleMenuClick(undefined)}
+            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+          >
+            <Copy className="h-4 w-4" />
+            <span>Copy</span>
+          </button>
+        )}
 
         {/* Cut button */}
-        <button
-          onClick={() => handleMenuClick(undefined)}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-        >
-          <Scissors className="h-4 w-4" />
-          <span>Cut</span>
-        </button>
+        {
+          visible.cut && (
+            <button
+              onClick={() => handleMenuClick(undefined)}
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+            >
+              <Scissors className="h-4 w-4" />
+              <span>Cut</span>
+            </button>
+          )
+        }
 
         {/* Move button */}
-        <button
-          onClick={() => handleMenuClick(onMove)}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-        >
-          <FolderInput className="h-4 w-4" />
-          <span>Move to...</span>
-        </button>
+        {
+          visible.move && (
+            <button
+              onClick={() => handleMenuClick(onMove)}
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+            >
+              <FolderInput className="h-4 w-4" />
+              <span>Move to...</span>
+            </button>
+          )
+        }
 
         {/* Download button */}
-        <button
-          onClick={() => handleMenuClick(undefined)}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-        >
-          <Download className="h-4 w-4" />
-          <span>Download</span>
-        </button>
+        {
+          visible.download && (
+            <button
+              onClick={() => handleMenuClick(undefined)}
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+            >
+              <Download className="h-4 w-4" />
+              <span>Download</span>
+            </button>
+          )
+        }
 
         {/* Delete button - styled as danger */}
-        <button
-          onClick={() => handleMenuClick(onDelete)}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors text-destructive hover:bg-destructive/10"
-        >
-          <Trash2 className="h-4 w-4" />
-          <span>Trash</span>
-        </button>
+        {
+          visible.delete && (
+            <button
+              onClick={() => handleMenuClick(onDelete)}
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="h-4 w-4" />
+              <span>
+                {location.pathname.includes('trash') ? 'Restore' : 'Move to Trash'}
+              </span>
+            </button>
+          )
+        }
       </div>
     </motion.div>
   );

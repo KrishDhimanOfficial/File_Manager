@@ -14,7 +14,7 @@ import {
 interface FileListProps {
   items: FileItem[];
   onItemClick: (item: FileItem) => void;
-  onItemDoubleClick: (item: FileItem) => void;
+  onItemDoubleClick?: (item: FileItem) => void;
   onContextMenu: (e: React.MouseEvent, item: FileItem) => void;
   selectedItems: string[];
 }
@@ -48,7 +48,6 @@ export const FileList = ({
   onContextMenu,
   selectedItems,
 }: FileListProps) => {
-  console.log(items);
   
   return (
     <div className="p-6">
@@ -64,7 +63,7 @@ export const FileList = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {items.map((item, index) => {
+          {items?.map((item, index) => {
             const isSelected = selectedItems.includes(item.id);
             return (
               <motion.tr

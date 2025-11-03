@@ -8,11 +8,12 @@ const router = express.Router({ strict: true, caseSensitive: true })
 router.post('/auth/login', authControllers.handleLogin)
 router.post('/auth/signup', authControllers.handleSignup)
 router.get('/auth/logout', authControllers.handleLogout)
-router.get('/auth/refresh', authControllers.handleRefresh)
+router.get('/auth/refresh', verifyAccessToken, authControllers.handleRefresh)
 
 router.get('/auth/verify', verifyAccessToken, (req, res) => res.json({ success: true }))
 
 router.get('/folders/:id?', folder_controllers.handleGetFolders)
+router.get('/trash/folders/:id?',folder_controllers.handleGetTrashFolders)
 router.route('/folder/:id?')
     .post(upload().none(), folder_controllers.handleCreateFolder)
     .patch(upload().none(), folder_controllers.handlefolderTrashStatus)

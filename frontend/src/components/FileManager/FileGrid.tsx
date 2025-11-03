@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card';
 interface FileGridProps {
   items: FileItem[];
   onItemClick: (item: FileItem) => void;
-  onItemDoubleClick: (item: FileItem) => void;
+  onItemDoubleClick?: (item: FileItem) => void;
   onContextMenu: (e: React.MouseEvent, item: FileItem) => void;
   selectedItems: string[];
 }
@@ -43,7 +43,7 @@ export const FileGrid = ({
 }: FileGridProps) => {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 p-6">
-      {items.map((item, index) => {
+      {items?.map((item, index) => {
         const isSelected = selectedItems.includes(item.id);
         return (
           <motion.div
