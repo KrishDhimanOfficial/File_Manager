@@ -1,8 +1,8 @@
 import { createNestedFolders, upload } from "../middleware/multer.middleware.js";
 import folderModel from "../models/folder.model.js";
 import validate from "../services/validate.service.js";
-import path from "node:path";
-import { handleTrashStatus } from "../utils/helpers.utils.js";
+import fs from 'node:fs'
+import { handleTrashStatus, validateId } from "../utils/helpers.utils.js";
 
 const folder_controllers = {
     handleCreateFolder: async (req, res) => {
@@ -27,6 +27,29 @@ const folder_controllers = {
         }
     },
 
+    handleRenameFolder: async (req, res) => {
+        try {
+            if (!validateId(req.params.id)) return res.status(400).json({ sucess: false, message: 'Invalid Request.' })
+
+            const response = await folderModel.findByIdAndUpdate({ _id: req.params.id }, { $set: { name: req.body.name } })
+            if (!response) return res.status(400).json({ sucess: false, message: 'Something went wrong.' })
+
+            const path = response.path.split('/')
+            const parentId = path[path.length - 2]
+            console.log(parentId);
+
+            // await createNestedFolders(req.body.name, parentId)
+            fs.promises.rename(`uploads/${response.path}`, `uploads/${req.body.name}`)
+
+            return res.status(200).json({
+                success: true,
+                message: 'Folder renamed successfully.',
+            })
+        } catch (error) {
+            if (error.name === 'ValidationError') validate(res, error.errors)
+            console.log('handleRenameFolder : ' + error.message)
+        }
+    },
     handleGetFolders: async (req, res) => {
         try {
             const response = await folderModel.find({ parentId: req.params.id || null })
@@ -40,7 +63,14 @@ const folder_controllers = {
     handlefolderTrashStatus: async (req, res) => {
         try {
             const { isTrash } = req.body
-            const response = await folderModel.findByIdAndUpdate({ _id: req.params.id }, { $set: { isTrash } }, { new: true })
+
+            const response = await folderModel.findByIdAndUpdate(
+                { _id: req.params.id },
+                {
+                    $set: {
+                        isTrash,
+                    }
+                }, { new: true })
             if (!response) return res.status(400).json({ error: 'Something went wrong.' })
 
             await handleTrashStatus(response._id, isTrash)
@@ -72,6 +102,7 @@ const folder_controllers = {
             console.log('handleGetTrashFolders : ' + error.message)
         }
     },
+
     handleDeleteFolder: async (req, res) => {
         try {
             const response = true
@@ -79,6 +110,16 @@ const folder_controllers = {
             return res.status(200).json({ success: 'move to trash.' })
         } catch (error) {
             console.log('handleDeleteFolder : ' + error.message)
+        }
+    },
+
+    handleUploadData: async (req, res) => {
+        try {
+            console.log('helo');
+
+        } catch (error) {
+            console.log('handleUploadData : ' + error.message)
+            return res.status(500).json({ success: false, message: 'Something went wrong.' })
         }
     },
 }

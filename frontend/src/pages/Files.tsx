@@ -14,6 +14,7 @@ import { FloatingActionButton } from '@/components/FileManager/FloatingActionBut
 import { FileItem } from '@/hooks/useFileManager';
 import { toast } from 'sonner';
 import Fetch from '@/hooks/Fetch';
+import { RenameFolderDialog } from '@/components/FileManager/RenameFolderDialog';
 
 const Files = () => {
     const {
@@ -44,6 +45,7 @@ const Files = () => {
     } = useContextMenu();
     const [searchQuery, setSearchQuery] = useState('');
     const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+    const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
     const [isNewFolderDialogOpen, setIsNewFolderDialogOpen] = useState(false);
     const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -120,18 +122,20 @@ const Files = () => {
     }
 
     // Handle rename button click
-    function handleRename() {
-        let itemId = contextMenuTargetId;
-        if (!itemId && selectedItems.length > 0) {
-            itemId = selectedItems[0];
-        }
+    function handleRename(newName: string) {
+        const itemId = localStorage.getItem('targetId')
+        if (itemId && newName) renameItem(itemId, newName)
+        // let itemId = contextMenuTargetId;
+        // if (!itemId && selectedItems.length > 0) {
+        //     itemId = selectedItems[0];
+        // }
 
-        if (itemId) {
-            const newName = prompt('Enter new name:');
-            if (newName) {
-                renameItem(itemId, newName);
-            }
-        }
+        // if (itemId) {
+        //     const newName = prompt('Enter new name:');
+        //     if (newName) {
+        //         renameItem(itemId, newName);
+        //     }
+        // }
     }
 
     // Handle move button click
@@ -199,10 +203,11 @@ const Files = () => {
             </div>
 
             <ContextMenu
+                targetId={contextMenuTargetId}
                 isOpen={isContextMenuOpen}
                 position={contextMenuPosition}
                 onClose={closeMenu}
-                onRename={handleRename}
+                onRename={() => setIsRenameDialogOpen(true)}
                 onDelete={updateTrash}
                 onMove={handleMoveClick}
                 onView={() => {
@@ -225,6 +230,12 @@ const Files = () => {
                 isOpen={isNewFolderDialogOpen}
                 onClose={() => setIsNewFolderDialogOpen(false)}
                 onConfirm={createFolder}
+            />
+
+            <RenameFolderDialog
+                isOpen={isRenameDialogOpen}
+                onOpenChange={() => setIsRenameDialogOpen(!isRenameDialogOpen)}
+                onConfirm={handleRename}
             />
 
             <MoveFolderDialog

@@ -14,12 +14,18 @@ const folderSchema = new mongoose.Schema({
         type: String,
         enum: ['folder', 'file'],
     },
+    size: {
+        type: Number
+    },
     path: {
         type: String
     },
     isTrash: {
         type: Boolean,
         default: false
+    },
+    trashTime: {
+        type: Number
     }
 },
     {

@@ -62,18 +62,7 @@ export const useFileManager = () => {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
     const createFolder = useCallback(async (name: string, parentId: string | null = null) => {
-        // console.log(name, parentId, currentFolder);
         const res = await Fetch.post('/folder', { name, parentId: parentId || currentFolder, type: 'folder' })
-        // console.log(res);
-
-        // const newFolder: FileItem = {
-        //     id: Date.now().toString(),
-        //     name,
-        //     type: 'folder',
-        //     parentId: parentId || currentFolder,
-        //     createdAt: new Date(),
-        //     updatedAt: new Date(),
-        // }
 
         setFiles(prev => [...prev, res.folder])
         res.success ? toast.success(`Folder "${name}" created successfully`) : toast.error(res.message)
@@ -122,7 +111,11 @@ export const useFileManager = () => {
 
     useEffect(() => { handleFolders() }, [currentFolder, handleFolders])
 
-    const uploadFile = useCallback((file: File, parentId: string | null = null) => {
+    const uploadFile = useCallback(async (file: File, parentId: string | null = null) => {
+        const formData = new FormData()
+        formData.append('file', file)
+        const res = await Fetch.post(`/upload/data?parentId=${parentId || currentFolder}`, formData)
+
         const newFile: FileItem = {
             id: Date.now().toString(),
             name: file.name,
@@ -138,14 +131,18 @@ export const useFileManager = () => {
         return newFile
     }, [currentFolder])
 
-
-    const renameItem = useCallback((itemId: string, newName: string) => {
+    const renameItem = useCallback(async (itemId: string, newName: string) => {
+        const res = await Fetch.put(`/folder/${itemId}`, { name: newName })
         setFiles(prev => prev.map(f =>
             f.id === itemId
-                ? { ...f, name: newName, updatedAt: new Date() }
+                ? { ...f, name: newName }
                 : f
         ))
-        toast.success('Item renamed successfully')
+        if (!res.success) {
+            toast.error(res.message)
+            return
+        }
+        toast.success(res.message)
     }, [])
 
     const moveItems = useCallback((itemIds: string[], targetFolderId: string | null) => {

@@ -88,7 +88,7 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          < RouterProvider router={routes} />
+          < RouterProvider router={routes} future={{ v7_startTransition: true, }} />
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>

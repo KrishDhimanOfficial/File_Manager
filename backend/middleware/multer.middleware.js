@@ -105,12 +105,12 @@ export const upload = (folder = '') => {
 export const createNestedFolders = async (folder = '', parentId) => {
     if (!parentId) {
         upload(folder)
-        return `uploads/${folder}`
+        return folder
     }
 
     const parentFolder = await folderModel.findById({ _id: parentId })
     const path = await findRelativePath(parentFolder.name)
-    
+
     fs.promises.mkdir(`${path}/${folder}`, { recursive: true })
     return `${path}/${folder}`
 }
@@ -137,19 +137,45 @@ export const findRelativePath = async (targetFolder) => {
     }
 
     search(baseDir, '')
-    return `uploads/${result}`
+    return result
 }
 
-export const uploadHandler = (config) => {
-    switch (config.type) {
-        case 'single':
-            return upload(config.folder).single(config.field_name)
-        case 'fields':
-            return upload(config.folder)
-                .fields(config.fields?.map(item => ({ name: item.field_name, maxCount: item.count })))
-        case 'multi':
-            return upload(config.folder).array(config.field_name, config.count)
-        default:
-            return upload().none()
+export const uploadFile = async (req, res, next) => {
+    try {
+        const { parentId } = req.query;
+        const parentFolder = await folderModel.findById({ _id: parentId })
+
+        if (parentId === 'null' && req.file?.fieldname) {
+            return upload().single('file')(req, res, next)
+        }
+
+        if (parentId === 'null' && Array.isArray(req.files)) {
+            return upload().array('file')(req, res, next)
+        }
+
+        if (parentId !== 'null' && req.file?.fieldname) {
+            return upload(parentFolder.path).single('file')(req, res, next)
+        }
+
+        if (parentId !== 'null' && Array.isArray(req.files)) {
+            return upload(parentFolder.path).single('file')(req, res, next)
+        }
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
+
+// export const uploadHandler = (config) => {
+//     switch (config.type) {
+//         case 'single':
+//             return upload(config.folder).single(config.field_name)
+//         case 'fields':
+//             return upload(config.folder)
+//                 .fields(config.fields?.map(item => ({ name: item.field_name, maxCount: item.count })))
+//         case 'multi':
+//             return upload(config.folder).array(config.field_name, config.count)
+//         default:
+//             return upload().none()
+//     }
+// }

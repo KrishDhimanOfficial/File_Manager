@@ -43,5 +43,6 @@ export const useContextMenu = () => {
         targetId,
         handleContextMenu,
         closeMenu,
+        setTargetId
     };
 }

@@ -4,7 +4,7 @@ import Cookies from 'js-cookie'
 class Fetch {
     ClientAPI: string | undefined;
     token: string | undefined;
-    
+
     constructor() {
         this.ClientAPI = config.serverURL
         this.token = Cookies.get('fileManager_token')
@@ -20,7 +20,7 @@ class Fetch {
             method: 'POST',
             headers: finalHeaders,
             credentials: 'include',
-            body: JSON.stringify(data)
+            body: data instanceof FormData ? data : JSON.stringify(data)
         })
         if (!res.ok) throw new Error('Internal Server Error!')
         return await res.json()
@@ -52,7 +52,7 @@ class Fetch {
             method: 'PUT',
             headers: finalHeaders,
             credentials: 'include',
-            body: JSON.stringify(data)
+            body: data instanceof FormData ? data : JSON.stringify(data)
         })
         if (!res.ok) throw new Error('Internal Server Error!')
         return await res.json()
@@ -69,7 +69,7 @@ class Fetch {
             method: 'PATCH',
             headers: finalHeaders,
             credentials: 'include',
-            body: JSON.stringify(data)
+            body: data instanceof FormData ? data : JSON.stringify(data)
         })
         if (!res.ok) throw new Error('Internal Server Error!')
         return await res.json()

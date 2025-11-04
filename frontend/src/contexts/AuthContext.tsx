@@ -40,12 +40,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     useEffect(() => {
-        setUser('grfvteb')
-        // const storedToken = Cookies.get('fileManager_token')
+        const storedToken = Cookies.get('fileManager_token')
+        setUser(storedToken)
 
         // if (isTokenExpired(storedToken)) handleRefreshToken()
         // else setUser(storedToken)
-
         setIsLoading(false)
     }, [])
 

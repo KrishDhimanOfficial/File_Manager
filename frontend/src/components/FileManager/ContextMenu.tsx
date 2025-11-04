@@ -1,4 +1,5 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { useContextMenu } from '@/hooks/useContextMenu';
+import { motion, AnimatePresence, } from 'framer-motion';
 import {
   Download,
   Edit,
@@ -8,13 +9,14 @@ import {
   FolderInput,
   Eye,
 } from 'lucide-react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-
 interface ContextMenuProps {
   isOpen: boolean;
+  targetId: string;
   position: { x: number; y: number };
   onClose?: () => void;
-  onRename?: () => void;
+  onRename?: any;
   onDelete?: () => void;
   onMove?: () => void;
   onView?: () => void;
@@ -29,7 +31,8 @@ interface ContextMenuProps {
   };
 }
 
-export const ContextMenu = ({
+export const ContextMenu = React.memo<ContextMenuProps>(({
+  targetId,
   isOpen,
   position,
   onClose,
@@ -48,6 +51,7 @@ export const ContextMenu = ({
   },
 }: ContextMenuProps) => {
   const location = useLocation()
+
   // Simple function to handle clicking a menu item
   function handleMenuClick(action: (() => void) | undefined) {
     if (action) {
@@ -61,6 +65,10 @@ export const ContextMenu = ({
     return null;
   }
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    localStorage.setItem("targetId", targetId)
+  }, [targetId])
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -88,13 +96,15 @@ export const ContextMenu = ({
         {/* Rename button */}
         {
           visible.rename && (
-            <button
-              onClick={() => handleMenuClick(onRename)}
-              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-            >
-              <Edit className="h-4 w-4" />
-              <span>Rename</span>
-            </button>
+            <>
+              <button
+                onClick={onRename}
+                className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+              >
+                <Edit className="h-4 w-4" />
+                <span>Rename</span>
+              </button>
+            </>
           )
         }
 
@@ -165,4 +175,4 @@ export const ContextMenu = ({
       </div>
     </motion.div>
   );
-};
+})

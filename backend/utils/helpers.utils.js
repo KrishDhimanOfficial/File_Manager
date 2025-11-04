@@ -1,3 +1,4 @@
+import mongoose from "mongoose"
 import folderModel from "../models/folder.model.js"
 
 export const handleTrashStatus = async (id, isTrash) => {
@@ -17,4 +18,8 @@ export const handleTrashStatus = async (id, isTrash) => {
         console.error('Error in handleTrashStatus:', error.message)
         throw new Error(error)
     }
+}
+
+export const validateId = (id) => {
+    return mongoose.Types.ObjectId.isValid(id)
 }
