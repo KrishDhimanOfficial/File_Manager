@@ -5,18 +5,20 @@ import fs from 'node:fs'
 import { handleTrashStatus, validateId } from "../utils/helpers.utils.js";
 import { deleteFile } from "../utils/removeFile.utils.js";
 import path from "node:path";
+import archiver from 'archiver'
 
 const folder_controllers = {
     handleCreateFolder: async (req, res) => {
         try {
-            console.log(req.body);
             const { name, parentId, type } = req.body;
+
+            const IsExist = await folderModel.findOne({ name })
+            if (IsExist) return res.status(400).json({ success: false, message: 'Name already exists.' })
 
             const response = await folderModel.create({ name, parentId, type, })
             if (!response) return res.status(400).json({ success: false, message: 'Something went wrong.' })
 
-            response.path = await createNestedFolders(name, parentId)
-            response.save()
+            await createNestedFolders(name, parentId)
 
             return res.status(200).json({
                 success: true,
@@ -34,16 +36,17 @@ const folder_controllers = {
             if (!validateId(req.params.id)) return res.status(400).json({ sucess: false, message: 'Invalid Request.' })
             const { name } = req.body;
 
+            const IsExist = await folderModel.findOne({ name })
+            if (IsExist) return res.status(400).json({ success: false, message: 'Name already exists.' })
+
             const response = await folderModel.findByIdAndUpdate({ _id: req.params.id }, { $set: { name } }).populate('parentId')
             if (!response) return res.status(400).json({ sucess: false, message: 'Something went wrong.' })
 
-            const oldpath = await findRelativePath(response.name)
+            const oldpath = findRelativePath(response.name)
             const newpath = response.parentId === null
                 ? `${name}`
-                : `${await findRelativePath(response.parentId.name)}/${name}`
+                : `${findRelativePath(response.parentId.name)}/${name}`
 
-            response.path = newpath
-            response.save()
             fs.promises.rename(`uploads/${oldpath}`, `uploads/${newpath}`)
 
             return res.status(200).json({
@@ -74,6 +77,9 @@ const folder_controllers = {
                 {
                     $set: {
                         isTrash,
+                        expiryTime: isTrash
+                            ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // ✅ 30 days ahead
+                            : null
                     }
                 }, { new: true })
             if (!response) return res.status(400).json({ error: 'Something went wrong.' })
@@ -145,20 +151,85 @@ const folder_controllers = {
             if (!validateId(req.params.id)) return res.status(400).json({ error: 'Invalid Request.' })
             const { name } = req.body;
             const response = await folderModel.findById(req.params.id).populate('parentId')
+
             if (!response) return res.status(404).json({ success: false, message: 'Not found' })
+            if (response.name.split('.')[0].toLowerCase() === name.toLowerCase()) return res.status(400).json({ success: false, message: 'Name already exists.' })
 
             const oldpath = response.path
             const newpath = response.parentId === null
                 ? `${name}.${response.extension}`
-                : `${await findRelativePath(response.parentId.name)}/${name}.${response.extension}`
+                : `${findRelativePath(response.parentId.name)}/${name}.${response.extension}`
 
             response.name = `${name}.${response.extension}`
             response.path = `uploads/${newpath}`
             await response.save()
             await fs.promises.rename(oldpath, `uploads/${newpath}`)
+
+            return res.status(200).json({
+                success: true,
+                name: `${name}.${response.extension}`,
+                message: 'File renamed successfully.'
+            })
         } catch (error) {
             console.log('handleRenameFile : ' + error.message)
             return res.status(500).json({ success: false, message: 'Something went wrong.' })
+        }
+    },
+    handleDownloadFolder: async (req, res) => {
+        try {
+            const folderName = req.params.folderName
+            const folderPath = findRelativePath(folderName)
+
+            // ✅ Check folder exists
+            if (!fs.existsSync(`uploads/${folderPath}`)) {
+                return res.status(404).json({ success: false, message: 'Folder not found' })
+            }
+
+            // ✅ Set headers to force download
+            res.setHeader('Content-Type', 'application/zip')
+            res.setHeader('Content-Disposition', `attachment; filename=${folderName}.zip`)
+
+            // ✅ Create archive
+            const archive = archiver('zip', { zlib: { level: 9 } })
+
+            // If archive error
+            archive.on('error', (err) => {
+                throw err
+            })
+
+            // Pipe archive data to response
+            archive.pipe(res)
+
+            // ✅ Add folder contents recursively
+            archive.directory(folderPath, false)
+
+            // ✅ Finalize the archive
+            await archive.finalize()
+        } catch (error) {
+            console.log('handleDownloadFolder : ' + error.message)
+            return res.status(500).json({ success: false, message: error.message })
+        }
+    },
+    handleDownloadFile: async (req, res) => {
+        try {
+            const response = await folderModel.findById(req.params.fileId)
+            if (!response) return res.status(404).json({ success: false, message: "File not found" })
+
+            const filePath = `uploads/${findRelativePath(response.name)}`
+
+            if (!fs.existsSync(filePath)) {
+                return res.status(404).json({ success: false, message: "File not found" })
+            }
+
+            return res.download(filePath, response.name, (err) => {
+                if (err) {
+                    console.error("Download error:", err)
+                    return res.status(500).json({ success: false, message: "Error downloading file" })
+                }
+            })
+        } catch (error) {
+            console.log('handleDownloadFile : ' + error.message)
+            return res.status(500).json({ success: false, message: "Error downloading file" })
         }
     },
 }

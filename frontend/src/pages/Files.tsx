@@ -15,6 +15,7 @@ import { FileItem } from '@/hooks/useFileManager';
 import { toast } from 'sonner';
 import Fetch from '@/hooks/Fetch';
 import { RenameFolderDialog } from '@/components/FileManager/RenameFolderDialog';
+import config from '../config/config';
 
 const Files = () => {
     const {
@@ -121,21 +122,27 @@ const Files = () => {
         contextMenuTargetId && trashItems(contextMenuTargetId, true)
     }
 
+    async function handleDownload() {
+        const Item = files.filter(f => f.id === contextMenuTargetId)
+        const folderName = Item[0].name;
+        const fileId = Item[0].id
+        const type = Item[0].type
+
+        const link = document.createElement('a')
+        link.href = type === 'folder'
+            ? `${config.serverURL}/download/folder/${folderName}`
+            : `${config.serverURL}/download/file/${fileId}`
+        link.setAttribute('download', `${folderName}.zip`)
+
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+    }
+
     // Handle rename button click
     function handleRename(newName: string) {
         const itemId = localStorage.getItem('targetId')
         if (itemId && newName) renameItem(itemId, newName)
-        // let itemId = contextMenuTargetId;
-        // if (!itemId && selectedItems.length > 0) {
-        //     itemId = selectedItems[0];
-        // }
-
-        // if (itemId) {
-        //     const newName = prompt('Enter new name:');
-        //     if (newName) {
-        //         renameItem(itemId, newName);
-        //     }
-        // }
     }
 
     // Handle move button click
@@ -152,6 +159,7 @@ const Files = () => {
         } else {
             itemsToMove = selectedItems;
         }
+        console.log(itemsToMove, targetFolderId);
 
         if (itemsToMove.length > 0) {
             moveItems(itemsToMove, targetFolderId);
@@ -210,6 +218,7 @@ const Files = () => {
                 onRename={() => setIsRenameDialogOpen(true)}
                 onDelete={updateTrash}
                 onMove={handleMoveClick}
+                onDownload={handleDownload}
                 onView={() => {
                     const item = contextMenuTargetId
                         ? currentItems.find(i => i.id === contextMenuTargetId)

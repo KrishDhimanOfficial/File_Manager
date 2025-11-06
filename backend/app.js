@@ -14,6 +14,8 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import cookieParser from 'cookie-parser'
 import siteRoutes from './routes/site.routes.js'
+import './utils/trashCleanup.cron.js'
+import router from './routes/routes.js'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -97,6 +99,7 @@ app.use(rateLimit(
   }
 ))
 
+app.use('/', router)
 app.use('/api', siteRoutes)
 
 app.use((err, req, res, next) => {

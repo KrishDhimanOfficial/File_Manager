@@ -82,14 +82,6 @@ const Trash = () => {
     function handleItemDoubleClick(item: FileItem) {
         setTargetId(item.id)
         setIsAlertOpen(!isAlertOpen)
-        // if (item.type === 'folder') {
-        //     // Open the folder
-        //     setCurrentFolder(item.id);
-        //     setSelectedItems([]);
-        // } else {
-        //     // Preview the file
-        //     setPreviewFile(item);
-        // }
     }
 
     // Handle upload button click

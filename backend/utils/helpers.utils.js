@@ -4,7 +4,14 @@ import folderModel from "../models/folder.model.js"
 export const handleTrashStatus = async (id, isTrash) => {
     try {
         // Update the current folder
-        await folderModel.findByIdAndUpdate(id, { $set: { isTrash } })
+        await folderModel.findByIdAndUpdate(id, {
+            $set: {
+                isTrash,
+                expiryTime: isTrash
+                    ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // ✅ 30 days ahead
+                    : null
+            }
+        })
 
         // Find all child folders
         const childFolders = await folderModel.find({ parentId: id })

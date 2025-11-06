@@ -5,6 +5,7 @@ import { formatBytes, formatDate } from '@/lib/fileUtils';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@radix-ui/react-avatar';
 import { AvatarImage } from '../ui/avatar';
+import config from '../../config/config';
 
 interface FileGridProps {
   items: FileItem[];
@@ -69,8 +70,12 @@ export const FileGrid = ({
                 {item.type === 'file' && (
                   <div className="mb-2">
                     <Avatar className="w-12 h-12">
-                      <AvatarImage src={`http://localhost:4000/${item.path}`} />
-                      <AvatarFallback>N/A</AvatarFallback>
+                      <AvatarImage src={`${config.serverURL}/${item.path}`} />
+                      <AvatarFallback>
+                        <div className="mb-2">
+                          {getFileIcon(fileExtension)}
+                        </div>
+                      </AvatarFallback>
                     </Avatar>
                   </div>
                 )}

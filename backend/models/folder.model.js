@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { findRelativePath } from "../middleware/multer.middleware.js";
 
 const folderSchema = new mongoose.Schema({
     name: {
@@ -18,9 +19,9 @@ const folderSchema = new mongoose.Schema({
     size: {
         type: Number
     },
-    path: {
-        type: String
-    },
+    // path: {
+    //     type: String
+    // },
     isTrash: {
         type: Boolean,
         default: false
@@ -28,8 +29,9 @@ const folderSchema = new mongoose.Schema({
     extension: {
         type: String
     },
-    trashTime: {
-        type: Number
+    expiryTime: {
+        type: Date,
+        default: null
     }
 },
     {
@@ -41,6 +43,13 @@ const folderSchema = new mongoose.Schema({
 // ✅ Create a virtual property "id" from "_id"
 folderSchema.virtual('id').get(function () {
     return this._id.toHexString()
+})
+
+folderSchema.virtual('path').get(function () {
+    const filePath = findRelativePath(this.name)
+    return this.type === 'file'
+        ? `uploads/${filePath}`
+        : null
 })
 
 export default mongoose.model('folder', folderSchema)

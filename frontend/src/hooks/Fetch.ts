@@ -7,7 +7,7 @@ class Fetch {
     private refreshPromise: Promise<string> | null = null;
 
     constructor() {
-        this.ClientAPI = config.serverURL
+        this.ClientAPI = `${config.serverURL}/api`
     }
 
     private getToken(): string | undefined {

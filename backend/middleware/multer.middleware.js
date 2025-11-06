@@ -109,13 +109,13 @@ export const createNestedFolders = async (folder = '', parentId) => {
     }
 
     const parentFolder = await folderModel.findById({ _id: parentId })
-    const path = await findRelativePath(parentFolder.name)
+    const path = findRelativePath(parentFolder.name)
 
     fs.promises.mkdir(`${path}/${folder}`, { recursive: true })
     return `${path}/${folder}`
 }
 
-export const findRelativePath = async (targetFolder) => {
+export const findRelativePath = (targetFolder) => {
     let result = null;
     const baseDir = path.resolve('uploads')
 
@@ -123,8 +123,13 @@ export const findRelativePath = async (targetFolder) => {
         const items = fs.readdirSync(currentDir, { withFileTypes: true })
 
         for (const item of items) {
+            const newRelativePath = path.join(relativePath, item.name)
+            if (item.name === targetFolder) {
+                result = newRelativePath;
+                return;
+            }
+
             if (item.isDirectory()) {
-                const newRelativePath = path.join(relativePath, item.name)
 
                 if (item.name === targetFolder) {
                     result = newRelativePath

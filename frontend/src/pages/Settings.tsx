@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Moon, Sun, Grid3x3, List, HardDrive, Bell, Shield } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -14,8 +14,21 @@ const Settings = () => {
     const handleThemeToggle = (checked: boolean) => {
         setDarkMode(checked);
         document.documentElement.classList.toggle('dark', checked);
-    };
+        localStorage.setItem('darkMode', checked.toString());
+    }
 
+    const handelDefaultView = (value: string) => {
+        setDefaultView(value);
+        localStorage.setItem('defaultView', value);
+    }
+
+    useEffect(() => {
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        setDarkMode(isDarkMode)
+        document.documentElement.classList.toggle('dark', isDarkMode)
+
+        setDefaultView(localStorage.getItem('defaultView') || 'grid')
+    }, [])
     return (
         <div className="min-h-screen bg-gradient-subtle">
             <div className="container mx-auto px-6 py-8 max-w-4xl">
@@ -55,7 +68,7 @@ const Settings = () => {
 
                             <div className="space-y-3">
                                 <Label>Default View</Label>
-                                <RadioGroup value={defaultView} onValueChange={setDefaultView}>
+                                <RadioGroup value={defaultView} onValueChange={handelDefaultView}>
                                     <div className="flex items-center space-x-2">
                                         <RadioGroupItem value="grid" id="grid" />
                                         <Label htmlFor="grid" className="flex items-center gap-2 cursor-pointer font-normal">
@@ -76,7 +89,7 @@ const Settings = () => {
                     </Card>
 
                     {/* Notifications */}
-                    <Card>
+                    {/* <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Bell className="h-5 w-5" />
@@ -101,7 +114,7 @@ const Settings = () => {
                                 />
                             </div>
                         </CardContent>
-                    </Card>
+                    </Card> */}
 
                     {/* Storage */}
                     <Card>
@@ -123,7 +136,7 @@ const Settings = () => {
                                 <div className="w-full bg-secondary rounded-full h-2">
                                     <div
                                         className="bg-gradient-primary h-2 rounded-full transition-all"
-                                        style={{ width: '24%' }}
+                                        style={{ width: '94%' }}
                                     />
                                 </div>
                             </div>

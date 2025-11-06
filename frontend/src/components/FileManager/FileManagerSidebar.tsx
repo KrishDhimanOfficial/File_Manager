@@ -20,7 +20,7 @@ import { toast } from 'sonner';
 const menuItems = [
   { title: 'Home', url: '/', icon: Home },
   { title: 'Files', url: '/files', icon: FolderOpen },
-  { title: 'Folders', url: '/folders', icon: Folders },
+  // { title: 'Folders', url: '/folders', icon: Folders },
   { title: 'Analytics', url: '/analytics', icon: BarChart3 },
   { title: 'Trash', url: '/trash', icon: FolderOpen },
   { title: 'Settings', url: '/settings', icon: SettingsIcon },

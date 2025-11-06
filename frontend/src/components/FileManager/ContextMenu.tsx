@@ -20,6 +20,7 @@ interface ContextMenuProps {
   onDelete?: () => void;
   onMove?: () => void;
   onView?: () => void;
+  onDownload: () => void;
   visible?: {
     rename?: boolean;
     delete?: boolean;
@@ -38,6 +39,7 @@ export const ContextMenu = React.memo<ContextMenuProps>(({
   onClose,
   onRename,
   onDelete,
+  onDownload,
   onMove,
   onView,
   visible = {
@@ -73,7 +75,7 @@ export const ContextMenu = React.memo<ContextMenuProps>(({
   if (!isOpen) {
     return null;
   }
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -114,18 +116,20 @@ export const ContextMenu = React.memo<ContextMenuProps>(({
         }
 
         {/* Copy button */}
-        {visible.copy && (
-          <button
-            onClick={() => handleMenuClick(undefined)}
-            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-          >
-            <Copy className="h-4 w-4" />
-            <span>Copy</span>
-          </button>
-        )}
+        {
+          // visible.copy && (
+          //   <button
+          //     onClick={() => handleMenuClick(undefined)}
+          //     className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+          //   >
+          //     <Copy className="h-4 w-4" />
+          //     <span>Copy</span>
+          //   </button>
+          // )
+        }
 
         {/* Cut button */}
-        {
+        {/* {
           visible.cut && (
             <button
               onClick={() => handleMenuClick(undefined)}
@@ -135,7 +139,7 @@ export const ContextMenu = React.memo<ContextMenuProps>(({
               <span>Cut</span>
             </button>
           )
-        }
+        } */}
 
         {/* Move button */}
         {
@@ -154,7 +158,7 @@ export const ContextMenu = React.memo<ContextMenuProps>(({
         {
           visible.download && (
             <button
-              onClick={() => handleMenuClick(undefined)}
+              onClick={() => handleMenuClick(onDownload)}
               className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
             >
               <Download className="h-4 w-4" />

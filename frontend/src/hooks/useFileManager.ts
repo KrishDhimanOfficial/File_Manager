@@ -75,7 +75,7 @@ export const useFileManager = () => {
             const res = currentFolder
                 ? await Fetch.get(`/folders/${currentFolder}`)
                 : await Fetch.get(`/folders`)
-            // console.table(res)
+            console.log(res)
             setFiles(res), setbreadcumbs([])
 
             if (currentFolder) {
@@ -100,6 +100,7 @@ export const useFileManager = () => {
     const trashItems = useCallback(async (id: string, isTrash: boolean) => {
         try {
             const res = await Fetch.patch(`/folder/${id}`, { isTrash })
+
             res.success && await handleFolders()
 
             res.success
@@ -140,7 +141,7 @@ export const useFileManager = () => {
 
         setFiles(prev => prev.map(f =>
             f.id === itemId
-                ? { ...f, name: newName }
+                ? { ...f, name: res.name }
                 : f
         ))
         if (!res.success) {
@@ -148,9 +149,11 @@ export const useFileManager = () => {
             return
         }
         toast.success(res.message)
-    }, [])
+    }, [files])
 
     const moveItems = useCallback((itemIds: string[], targetFolderId: string | null) => {
+        console.log(itemIds, targetFolderId);
+
         setFiles(prev => prev.map(f =>
             itemIds.includes(f.id)
                 ? { ...f, parentId: targetFolderId, updatedAt: new Date() }
@@ -164,8 +167,7 @@ export const useFileManager = () => {
             return files.filter(f => f.parentId === folderId && f.isTrash === isTrash);
         },
         [files]
-    );
-
+    )
 
     const getItemById = useCallback((itemId: string) => {
         return files.find(f => f.id === itemId)
