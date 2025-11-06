@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFileManager } from '@/hooks/useFileManager';
 import { useContextMenu } from '@/hooks/useContextMenu';
 import { FileToolbar } from '@/components/FileManager/FileToolbar';

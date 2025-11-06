@@ -72,7 +72,10 @@ const authControllers = {
             const user = jwt.verifyToken(token, config.jwt_refresh_key)
             const decoded = jwt.jwtDecrypt(user.data)
 
-            const response = await adminModel.findById({ _id: decoded.id })
+            const response = await adminModel.findById(decoded.id)
+            if (!response) {
+                return res.status(404).json({ success: false, message: "User not found" })
+            }
 
             const payload = jwt.jwtEncrypt({ id: response._id })
             const accessToken = jwt.accessToken({ data: payload })
@@ -80,7 +83,7 @@ const authControllers = {
 
             res.cookie("refreshToken", newRefresh, {
                 httpOnly: true,
-                secure: true,
+                secure: config.node_env === "production",
                 sameSite: "strict",
                 path: "/",
                 maxAge: 7 * 24 * 60 * 60 * 1000
@@ -97,7 +100,7 @@ const authControllers = {
         try {
             res.clearCookie("refreshToken", {
                 sameSite: "strict",
-                secure: true,
+                secure: config.node_env === "production",
                 path: "/",
             });
             return res.status(200).json({ success: true, message: "Logged out" })

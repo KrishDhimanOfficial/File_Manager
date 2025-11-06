@@ -8,7 +8,8 @@ const folderSchema = new mongoose.Schema({
     },
     parentId: {
         type: mongoose.Schema.Types.ObjectId,
-        default: null
+        default: null,
+        ref: 'folder'
     },
     type: {
         type: String,
@@ -23,6 +24,9 @@ const folderSchema = new mongoose.Schema({
     isTrash: {
         type: Boolean,
         default: false
+    },
+    extension: {
+        type: String
     },
     trashTime: {
         type: Number

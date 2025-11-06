@@ -3,6 +3,8 @@ import { FileIcon, FolderIcon, Image, FileText, File } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatBytes, formatDate } from '@/lib/fileUtils';
 import { Card } from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@radix-ui/react-avatar';
+import { AvatarImage } from '../ui/avatar';
 
 interface FileGridProps {
   items: FileItem[];
@@ -12,27 +14,27 @@ interface FileGridProps {
   selectedItems: string[];
 }
 
-const getFileIcon = (item: FileItem) => {
-  if (item.type === 'folder') {
-    return <FolderIcon className="h-12 w-12 text-primary" />;
-  }
+const getFileIcon = (extension: string) => {
 
-  switch (item.extension) {
-    case 'jpg':
-    case 'jpeg':
-    case 'png':
-    case 'gif':
-    case 'webp':
-      return <Image className="h-12 w-12 text-primary" />;
+  switch (extension) {
+    case 'folder':
+      return <FolderIcon className="h-12 w-12 text-primary" />;
+    // case 'jpg':
+    // case 'jpeg':
+    // case 'png':
+    // case 'gif':
+    // case 'webp':
+    //   return <Image className="h-12 w-12 text-primary" />;
     case 'txt':
     case 'md':
+    case 'pdf':
     case 'doc':
     case 'docx':
       return <FileText className="h-12 w-12 text-primary" />;
     default:
       return <File className="h-12 w-12 text-muted-foreground" />;
   }
-};
+}
 
 export const FileGrid = ({
   items,
@@ -45,6 +47,7 @@ export const FileGrid = ({
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 p-6">
       {items?.map((item, index) => {
         const isSelected = selectedItems.includes(item.id);
+        const fileExtension = item.type === 'file' && item.name.split('.').pop() || 'folder';
         return (
           <motion.div
             key={item.id}
@@ -63,9 +66,21 @@ export const FileGrid = ({
               onContextMenu={(e) => onContextMenu(e, item)}
             >
               <div className="flex flex-col items-center gap-2">
-                <div className="mb-2">
-                  {getFileIcon(item)}
-                </div>
+                {item.type === 'file' && (
+                  <div className="mb-2">
+                    <Avatar className="w-12 h-12">
+                      <AvatarImage src={`http://localhost:4000/${item.path}`} />
+                      <AvatarFallback>N/A</AvatarFallback>
+                    </Avatar>
+                  </div>
+                )}
+                {
+                  item.type === 'folder' && (
+                    <div className="mb-2">
+                      {getFileIcon(fileExtension)}
+                    </div>
+                  )
+                }
                 <p className="text-sm font-medium text-center truncate w-full" title={item.name}>
                   {item.name}
                 </p>

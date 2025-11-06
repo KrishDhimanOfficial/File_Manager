@@ -9,6 +9,7 @@ export interface FileItem {
     type: 'file' | 'folder'
     parentId: string | null
     size?: number
+    path?: string
     extension?: string
     createdAt: Date
     updatedAt: Date
@@ -74,7 +75,7 @@ export const useFileManager = () => {
             const res = currentFolder
                 ? await Fetch.get(`/folders/${currentFolder}`)
                 : await Fetch.get(`/folders`)
-
+            // console.table(res)
             setFiles(res), setbreadcumbs([])
 
             if (currentFolder) {
@@ -108,31 +109,35 @@ export const useFileManager = () => {
             console.error(error)
         }
     }, [handleFolders])
-
     useEffect(() => { handleFolders() }, [currentFolder, handleFolders])
 
     const uploadFile = useCallback(async (file: File, parentId: string | null = null) => {
         const formData = new FormData()
         formData.append('file', file)
         const res = await Fetch.post(`/upload/data?parentId=${parentId || currentFolder}`, formData)
-
-        const newFile: FileItem = {
-            id: Date.now().toString(),
-            name: file.name,
-            type: 'file',
-            parentId: parentId || currentFolder,
-            size: file.size,
-            extension: file.name.split('.').pop(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        }
+        // const newFile: FileItem = {
+        //     id: Date.now().toString(),
+        //     name: file.name,
+        //     type: 'file',
+        //     parentId: parentId || currentFolder,
+        //     size: file.size,
+        //     extension: file.name.split('.').pop(),
+        //     createdAt: new Date(),
+        //     updatedAt: new Date(),
+        // }
+        const newFile = res.file
         setFiles(prev => [...prev, newFile])
+
+        if (!res.success) toast.error(res.message)
         toast.success(`File "${file.name}" uploaded successfully`)
-        return newFile
+        return res.file
     }, [currentFolder])
 
     const renameItem = useCallback(async (itemId: string, newName: string) => {
-        const res = await Fetch.put(`/folder/${itemId}`, { name: newName })
+        const itemType = files.find(f => f.id === itemId)?.type
+        const api = itemType === 'folder' ? `/folder/${itemId}` : `/upload/data/${itemId}`;
+        const res = await Fetch.put(api, { name: newName })
+
         setFiles(prev => prev.map(f =>
             f.id === itemId
                 ? { ...f, name: newName }

@@ -12,6 +12,8 @@ interface AuthContextType {
 }
 
 function isTokenExpired(token: string | null): boolean {
+    if (!token) return true
+    
     try {
         const payload = JSON.parse(atob(token.split('.')[1]))
         const currentTime = Math.floor(Date.now() / 1000)
@@ -32,38 +34,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isLoading, setIsLoading] = useState(true)
 
     const handleRefreshToken = async () => {
-        const response = await Fetch.get('/auth/refresh')
-        Cookies.set('fileManager_token', response.accessToken)
-
-        if (response.success) setUser(response.accessToken)
-        else setUser(null)
+        try {
+            const response = await Fetch.get('/auth/refresh')
+            if (response.success && response.accessToken) {
+                Cookies.set('fileManager_token', response.accessToken)
+                setUser(response.accessToken)
+                setAuthenticated(true)
+                return true
+            }
+            setUser(null)
+            setAuthenticated(false)
+            return false
+        } catch (error) {
+            console.error('Token refresh failed:', error)
+            setUser(null)
+            setAuthenticated(false)
+            Cookies.remove('fileManager_token')
+            return false
+        }
     }
 
     useEffect(() => {
         const storedToken = Cookies.get('fileManager_token')
-        setUser(storedToken)
-
-        // if (isTokenExpired(storedToken)) handleRefreshToken()
-        // else setUser(storedToken)
-        setIsLoading(false)
+        
+        if (storedToken) {
+            if (isTokenExpired(storedToken)) {
+                handleRefreshToken().finally(() => setIsLoading(false))
+            } else {
+                setUser(storedToken)
+                setAuthenticated(true)
+                setIsLoading(false)
+            }
+        } else {
+            setUser(null)
+            setAuthenticated(false)
+            setIsLoading(false)
+        }
     }, [])
 
     const login = async (email: string, password: string) => {
         const response = await Fetch.post('/auth/login', { email, password })
-        setUser(response.accessToken)
-        Cookies.set('fileManager_token', response.accessToken)
+        if (response.success && response.accessToken) {
+            setUser(response.accessToken)
+            setAuthenticated(true)
+            Cookies.set('fileManager_token', response.accessToken)
+        }
         return response
     }
 
     const signup = async (email: string, password: string, name: string) => {
         const response = await Fetch.post('/auth/signup', { email, password, name })
-        Cookies.set('fileManager_token', response.accessToken, { secure: true, sameSite: 'Strict' })
-        setUser(response.accessToken)
+        if (response.success && response.accessToken) {
+            Cookies.set('fileManager_token', response.accessToken, { secure: true, sameSite: 'Strict' })
+            setUser(response.accessToken)
+            setAuthenticated(true)
+        }
         return response
     }
 
     const logout = async () => {
         setUser(null)
+        setAuthenticated(false)
         Cookies.remove('fileManager_token')
         await Fetch.get('/auth/logout')
     }

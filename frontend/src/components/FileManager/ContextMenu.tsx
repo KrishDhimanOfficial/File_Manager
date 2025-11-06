@@ -52,6 +52,15 @@ export const ContextMenu = React.memo<ContextMenuProps>(({
 }: ContextMenuProps) => {
   const location = useLocation()
 
+  // Persist a valid 24-char id; keep last valid when current is invalid/null
+  useEffect(() => {
+    const id = typeof targetId === 'string' ? targetId : ''
+    if (id && id.length === 24) {
+      localStorage.setItem('targetId', id)
+    }
+    // Do not clear here to allow fallback to last valid id
+  }, [targetId])
+
   // Simple function to handle clicking a menu item
   function handleMenuClick(action: (() => void) | undefined) {
     if (action) {
@@ -64,11 +73,7 @@ export const ContextMenu = React.memo<ContextMenuProps>(({
   if (!isOpen) {
     return null;
   }
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    localStorage.setItem("targetId", targetId)
-  }, [targetId])
+  
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
