@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useFileManager } from '@/hooks/useFileManager';
 import { useContextMenu } from '@/hooks/useContextMenu';
 import { FileToolbar } from '@/components/FileManager/FileToolbar';
@@ -29,11 +29,13 @@ const Files = () => {
         createFolder,
         uploadFile,
         trashItems,
+        allItems,
         // deleteItems: handleDelete,
         renameItem,
         moveItems,
         getItemsByFolder,
-        breadcumbs
+        breadcumbs,
+        setbreadcumbs,
         // getBreadcrumbs,
     } = useFileManager();
 
@@ -152,24 +154,23 @@ const Files = () => {
 
     // Handle confirming the move
     function handleMoveConfirm(targetFolderId: string | null) {
-        let itemsToMove: string[] = [];
-
-        if (contextMenuTargetId) {
-            itemsToMove = [contextMenuTargetId];
-        } else {
-            itemsToMove = selectedItems;
-        }
-        console.log(itemsToMove, targetFolderId);
-
-        if (itemsToMove.length > 0) {
-            moveItems(itemsToMove, targetFolderId);
-            setSelectedItems([]);
-        }
+        const itemsToMove: string = localStorage.getItem('targetId') || '';
+        moveItems(itemsToMove, targetFolderId)
     }
 
-    // Get all folders for the move dialog
-    const allFolders = files.filter(item => item.type === 'folder');
+    const handleBreadcrumbClick = useCallback(() => {
+        setbreadcumbs(prev => {
+            const index = prev.findIndex(f => f.id === currentFolder)
+            if (index === -1) return prev // not found
+            return prev.slice(0, index + 1) // keep only up to clicked one
+        })
+        setCurrentFolder(currentFolder)
+    }, [currentFolder, setCurrentFolder, setbreadcumbs])
 
+    // Get all folders for the move dialog
+    const allFolders = allItems.filter(item => item.type === 'folder')
+
+    useEffect(() => { handleBreadcrumbClick() }, [handleBreadcrumbClick])
     return (
         <div className="flex flex-col h-screen" onDragOver={(e) => e.preventDefault()}>
             <FileToolbar

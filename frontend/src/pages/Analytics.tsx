@@ -11,15 +11,15 @@ import { motion } from "framer-motion";
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))'];
 
 export default function Analytics() {
-    const { files } = useFileManager();
+    const { allItems } = useFileManager();
 
     const stats = useMemo(() => {
-        const totalFiles = files.filter(f => f.type === 'file').length;
-        const totalFolders = files.filter(f => f.type === 'folder').length;
-        const totalStorage = files.filter(f => f.type === 'file').reduce((acc, f) => acc + (f.size || 0), 0);
+        const totalallItems = allItems.filter(f => f.type === 'file').length;
+        const totalFolders = allItems.filter(f => f.type === 'folder').length;
+        const totalStorage = allItems.filter(f => f.type === 'file').reduce((acc, f) => acc + (f.size || 0), 0);
 
         // File type distribution
-        const fileTypeMap = files
+        const fileTypeMap = allItems
             .filter(f => f.type === 'file')
             .reduce((acc, f) => {
                 const ext = f.extension || 'other';
@@ -28,35 +28,36 @@ export default function Analytics() {
             }, {} as Record<string, number>);
 
         const fileTypeData = Object.entries(fileTypeMap)
-            .map(([type, count]) => ({
+            .map(([type, count]: [string, number]) => ({
                 name: type.toUpperCase(),
                 value: count,
-                percentage: ((count / totalFiles) * 100).toFixed(1)
+                percentage: ((count / totalallItems) * 100).toFixed(1)
             }))
             .sort((a, b) => b.value - a.value);
 
-        // Recently uploaded files
-        const recentFiles = [...files]
+        // Recently uploaded allItems
+        const recentallItems = [...allItems]
             .filter(f => f.type === 'file')
-            .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
             .slice(0, 5);
 
-        // Largest files
-        const largestFiles = [...files]
+        // Largest allItems
+        const largestallItems = [...allItems]
             .filter(f => f.type === 'file')
             .sort((a, b) => (b.size || 0) - (a.size || 0))
             .slice(0, 5);
 
         // Upload activity over time (last 7 days)
         const today = new Date();
+
         const uploadActivity = Array.from({ length: 7 }, (_, i) => {
             const date = new Date(today);
             date.setDate(date.getDate() - (6 - i));
             const dayStart = new Date(date.setHours(0, 0, 0, 0));
             const dayEnd = new Date(date.setHours(23, 59, 59, 999));
 
-            const count = files.filter(f => {
-                const created = f.createdAt.getTime();
+            const count = allItems.filter(f => {
+                const created = new Date(f.createdAt).getTime();
                 return created >= dayStart.getTime() && created <= dayEnd.getTime();
             }).length;
 
@@ -67,7 +68,7 @@ export default function Analytics() {
         });
 
         // Storage by file type
-        const storageByType = files
+        const storageByType = allItems
             .filter(f => f.type === 'file')
             .reduce((acc, f) => {
                 const ext = f.extension || 'other';
@@ -76,7 +77,7 @@ export default function Analytics() {
             }, {} as Record<string, number>);
 
         const storageData = Object.entries(storageByType)
-            .map(([type, size]) => ({
+            .map(([type, size]: [string, number]) => ({
                 name: type.toUpperCase(),
                 size: size,
                 formatted: formatBytes(size)
@@ -85,19 +86,19 @@ export default function Analytics() {
             .slice(0, 5);
 
         return {
-            totalFiles,
+            totalallItems,
             totalFolders,
             totalStorage,
             fileTypeData,
-            recentFiles,
-            largestFiles,
+            recentallItems,
+            largestallItems,
             uploadActivity,
             storageData
         };
-    }, [files]);
+    }, [allItems]);
 
     const statCards = [
-        { title: "Total Files", value: stats.totalFiles, icon: FileIcon, description: "Files in storage" },
+        { title: "Total Files", value: stats.totalallItems, icon: FileIcon, description: "Files in storage" },
         { title: "Total Folders", value: stats.totalFolders, icon: FolderIcon, description: "Directory count" },
         { title: "Storage Used", value: formatBytes(stats.totalStorage), icon: HardDrive, description: "Total space occupied" },
         { title: "File Types", value: stats.fileTypeData.length, icon: Database, description: "Different formats" }
@@ -152,7 +153,7 @@ export default function Analytics() {
                                 <ChartContainer
                                     config={{
                                         value: {
-                                            label: "Files",
+                                            label: "allItems",
                                             color: "hsl(var(--primary))",
                                         },
                                     }}
@@ -182,7 +183,7 @@ export default function Analytics() {
                         <Card>
                             <CardHeader>
                                 <CardTitle>File Count by Type</CardTitle>
-                                <CardDescription>Number of files per format</CardDescription>
+                                <CardDescription>Number of allItems per format</CardDescription>
                             </CardHeader>
                             <CardContent className="h-[300px]">
                                 <ChartContainer
@@ -278,17 +279,17 @@ export default function Analytics() {
                             <Clock className="h-5 w-5" />
                             Recently Uploaded
                         </CardTitle>
-                        <CardDescription>Your latest files</CardDescription>
+                        <CardDescription>Your latest allItems</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-3">
-                            {stats.recentFiles.map((file) => (
+                            {stats.recentallItems.map((file) => (
                                 <div key={file.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-accent/50 transition-colors">
                                     <div className="flex items-center gap-3 min-w-0">
                                         <FileIcon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                         <div className="min-w-0">
                                             <p className="text-sm font-medium truncate">{file.name}</p>
-                                            <p className="text-xs text-muted-foreground">{formatDate(file.createdAt)}</p>
+                                            <p className="text-xs text-muted-foreground">{formatDate(new Date(file.createdAt))}</p>
                                         </div>
                                     </div>
                                     <span className="text-xs text-muted-foreground flex-shrink-0 ml-2">
@@ -304,13 +305,13 @@ export default function Analytics() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <TrendingUp className="h-5 w-5" />
-                            Largest Files
+                            Largest allItems
                         </CardTitle>
                         <CardDescription>Top 5 by size</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-3">
-                            {stats.largestFiles.map((file) => (
+                            {stats.largestallItems.map((file) => (
                                 <div key={file.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-accent/50 transition-colors">
                                     <div className="flex items-center gap-3 min-w-0">
                                         <FileIcon className="h-4 w-4 text-muted-foreground flex-shrink-0" />

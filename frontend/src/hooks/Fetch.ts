@@ -124,7 +124,7 @@ class Fetch {
         return await res.json()
     }
 
-    async put(endURL: string, data: object, headers?: object): Promise<any> {
+    async put(endURL: string, data?: object, headers?: object): Promise<any> {
         const finalHeaders: HeadersInit = {
             ...(data instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
             ...(headers || {})

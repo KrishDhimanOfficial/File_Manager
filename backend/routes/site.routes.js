@@ -12,12 +12,17 @@ router.get('/auth/refresh', authControllers.handleRefresh)
 
 router.get('/auth/verify', verifyAccessToken, (req, res) => res.json({ success: true }))
 
+router.get('/all/items', folder_controllers.handleGetAllItems)
 router.get('/folders/:id?', folder_controllers.handleGetFolders)
 router.get('/trash/folders/:id?', folder_controllers.handleGetTrashFolders)
+
 router.route('/folder/:id?')
     .post(upload().none(), folder_controllers.handleCreateFolder)
     .put(upload().none(), folder_controllers.handleRenameFolder)
     .patch(upload().none(), folder_controllers.handlefolderTrashStatus)
+
+router.put('/move/folder/:targetId/:itemId', folder_controllers.handleMoveFolder)
+router.put('/move/file/:targetId/:itemId', folder_controllers.handleMoveFile)
 
 router.route('/upload/data/:id?')
     .post(uploadFile, folder_controllers.handleUploadData)

@@ -57,6 +57,7 @@ const initialFiles: FileItem[] = [
 
 export const useFileManager = () => {
     const [files, setFiles] = useState([])
+    const [allItems, setAllItems] = useState([])
     const [currentFolder, setCurrentFolder] = useState<string | null>(null)
     const [selectedItems, setSelectedItems] = useState<string[]>([])
     const [breadcumbs, setbreadcumbs] = useState<Array<any>>([])
@@ -75,21 +76,21 @@ export const useFileManager = () => {
             const res = currentFolder
                 ? await Fetch.get(`/folders/${currentFolder}`)
                 : await Fetch.get(`/folders`)
-            console.log(res)
-            setFiles(res), setbreadcumbs([])
+            // console.log(res)
+            setFiles(res)
 
             if (currentFolder) {
-                const u: Array<any> = res[0]?.path.split('/')
-                u.shift()
-                u.pop()
+                // const u: Array<any> = res[0]?.path.split('/')
+                // u.shift()
+                // u.pop()
 
-                const base = u?.map((folder: any) => {
-                    return {
-                        name: folder,
-                        id: res[0].parentId
-                    }
-                })
-                setbreadcumbs(base)
+                // const base = u?.map((folder: any) => {
+                //     return {
+                //         name: folder,
+                //         id: res[0].parentId
+                //     }
+                // })
+                // setbreadcumbs(base)
             }
         } catch (error) {
             console.error(error);
@@ -100,7 +101,6 @@ export const useFileManager = () => {
     const trashItems = useCallback(async (id: string, isTrash: boolean) => {
         try {
             const res = await Fetch.patch(`/folder/${id}`, { isTrash })
-
             res.success && await handleFolders()
 
             res.success
@@ -110,22 +110,13 @@ export const useFileManager = () => {
             console.error(error)
         }
     }, [handleFolders])
+
     useEffect(() => { handleFolders() }, [currentFolder, handleFolders])
 
     const uploadFile = useCallback(async (file: File, parentId: string | null = null) => {
         const formData = new FormData()
         formData.append('file', file)
         const res = await Fetch.post(`/upload/data?parentId=${parentId || currentFolder}`, formData)
-        // const newFile: FileItem = {
-        //     id: Date.now().toString(),
-        //     name: file.name,
-        //     type: 'file',
-        //     parentId: parentId || currentFolder,
-        //     size: file.size,
-        //     extension: file.name.split('.').pop(),
-        //     createdAt: new Date(),
-        //     updatedAt: new Date(),
-        // }
         const newFile = res.file
         setFiles(prev => [...prev, newFile])
 
@@ -151,16 +142,24 @@ export const useFileManager = () => {
         toast.success(res.message)
     }, [files])
 
-    const moveItems = useCallback((itemIds: string[], targetFolderId: string | null) => {
-        console.log(itemIds, targetFolderId);
+    const moveItems = useCallback(async (itemId: string, targetFolderId: string | null) => {
+        const itemType = files.find(f => f.id === itemId)?.type
+        const api = itemType === 'folder' ? `/move/folder/${targetFolderId}/${itemId}` : `/move/file/${targetFolderId}/${itemId}`;
+        const res: any = await Fetch.put(api)
+        if (!res.success) {
+            toast.error(res.message)
+            return
+        }
 
-        setFiles(prev => prev.map(f =>
-            itemIds.includes(f.id)
-                ? { ...f, parentId: targetFolderId, updatedAt: new Date() }
-                : f
-        ))
-        toast.success(`${itemIds.length} item(s) moved successfully`)
-    }, [])
+        setFiles(prev => [
+            ...prev.map(f =>
+                f.id === itemId
+                    ? { ...f, parentId: targetFolderId }
+                    : f
+            )
+        ])
+        toast.success(`${res.item.name} item moved successfully`)
+    }, [files])
 
     const getItemsByFolder = useCallback(
         (folderId: string | null, { isTrash = false }: { isTrash?: boolean } = {}) => {
@@ -172,6 +171,26 @@ export const useFileManager = () => {
     const getItemById = useCallback((itemId: string) => {
         return files.find(f => f.id === itemId)
     }, [files])
+
+    const handleGetAllItems = async () => {
+        const res = await Fetch.get('/all/items')
+        setAllItems(res)
+    }
+
+    useEffect(() => { handleGetAllItems() }, [])
+
+    useEffect(() => {
+        if (!currentFolder) return setbreadcumbs([])
+        const selected = allItems.filter(f => f.type === 'folder' && f.id === currentFolder)
+
+        setbreadcumbs(prev => {
+            const updated = [...prev, ...selected]
+            const unique = updated.filter(
+                (item, index, self) => index === self.findIndex(f => f.id === item.id)
+            )
+            return unique
+        })
+    }, [currentFolder, allItems])
 
     return {
         files,
@@ -189,5 +208,7 @@ export const useFileManager = () => {
         getItemsByFolder,
         getItemById,
         breadcumbs,
+        allItems,
+        setbreadcumbs
     }
 }

@@ -19,9 +19,6 @@ const folderSchema = new mongoose.Schema({
     size: {
         type: Number
     },
-    // path: {
-    //     type: String
-    // },
     isTrash: {
         type: Boolean,
         default: false

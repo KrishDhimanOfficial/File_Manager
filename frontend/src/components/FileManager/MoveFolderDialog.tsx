@@ -7,10 +7,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import FolderTree from './FolderTree';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FolderIcon, Home } from 'lucide-react';
 import { FileItem } from '@/hooks/useFileManager';
+import { Home } from 'lucide-react';
 
 interface MoveFolderDialogProps {
     isOpen: boolean;
@@ -99,24 +100,11 @@ export const MoveFolderDialog = ({
                         )}
 
                         {/* List all available folders */}
-                        {availableFolders.map((folder) => {
-                            const isFolderSelected = selectedFolder === folder.id;
-
-                            return (
-                                <button
-                                    key={folder.id}
-                                    onClick={() => setSelectedFolder(folder.id)}
-                                    className={
-                                        isFolderSelected
-                                            ? 'flex items-center gap-3 w-full px-3 py-2 rounded-md transition-colors text-left bg-accent text-accent-foreground'
-                                            : 'flex items-center gap-3 w-full px-3 py-2 rounded-md transition-colors text-left hover:bg-accent/50'
-                                    }
-                                >
-                                    <FolderIcon className="h-5 w-5" />
-                                    <span>{folder.name}</span>
-                                </button>
-                            );
-                        })}
+                        <FolderTree
+                            folders={availableFolders}
+                            selectedFolder={selectedFolder}
+                            setSelectedFolder={setSelectedFolder}
+                        />
                     </div>
                 </ScrollArea>
 

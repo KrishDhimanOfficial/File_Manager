@@ -130,14 +130,11 @@ export const findRelativePath = (targetFolder) => {
             }
 
             if (item.isDirectory()) {
-
-                if (item.name === targetFolder) {
-                    result = newRelativePath
-                    return
-                }
-
                 search(path.join(currentDir, item.name), newRelativePath)
             }
+
+            // stop recursion early if found
+            if (result) return
         }
     }
 

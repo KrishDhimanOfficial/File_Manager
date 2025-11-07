@@ -155,13 +155,12 @@ const folder_controllers = {
             if (!response) return res.status(404).json({ success: false, message: 'Not found' })
             if (response.name.split('.')[0].toLowerCase() === name.toLowerCase()) return res.status(400).json({ success: false, message: 'Name already exists.' })
 
-            const oldpath = response.path
+            const oldpath = `uploads/${findRelativePath(response.name)}`
             const newpath = response.parentId === null
                 ? `${name}.${response.extension}`
                 : `${findRelativePath(response.parentId.name)}/${name}.${response.extension}`
 
             response.name = `${name}.${response.extension}`
-            response.path = `uploads/${newpath}`
             await response.save()
             await fs.promises.rename(oldpath, `uploads/${newpath}`)
 
@@ -230,6 +229,57 @@ const folder_controllers = {
         } catch (error) {
             console.log('handleDownloadFile : ' + error.message)
             return res.status(500).json({ success: false, message: "Error downloading file" })
+        }
+    },
+    handleMoveFolder: async (req, res) => {
+        try {
+            const { targetId, itemId } = req.params;
+            const targetFolderId = targetId === 'null' ? null : targetId
+
+            const response = await folderModel.findByIdAndUpdate(itemId, { $set: { parentId: targetFolderId } }, { new: true })
+            if (!response) return res.status(400).json({ success: false, message: 'Something went wrong.' })
+            const target = targetId !== 'null' && await folderModel.findById(targetId)
+
+            const oldpath = `uploads/${findRelativePath(response.name)}`
+            const newpath = response.parentId === null
+                ? `uploads/${response.name}`
+                : `uploads/${findRelativePath(target.name)}/${response.name}`
+
+            await fs.promises.rename(oldpath, newpath)
+            return res.status(200).json({ item: response, success: true, message: 'File moved successfully.' })
+        } catch (error) {
+            console.log('handleMoveFolder : ' + error.message)
+            return res.status(500).json({ success: false, message: 'Something went wrong.' })
+        }
+    },
+    handleMoveFile: async (req, res) => {
+        try {
+            const { targetId, itemId } = req.params;
+            const targetFileId = targetId === 'null' ? null : targetId
+
+            const response = await folderModel.findByIdAndUpdate(itemId, { $set: { parentId: targetFileId } }, { new: true })
+            if (!response) return res.status(400).json({ success: false, message: 'Something went wrong.' })
+
+            const target = targetId !== 'null' && await folderModel.findById(targetId)
+
+            const oldpath = `uploads/${findRelativePath(response.name)}`
+            const newpath = response.parentId === null
+                ? `uploads/${response.name}`
+                : `uploads/${findRelativePath(target.name)}/${response.name}`
+
+            await fs.promises.rename(oldpath, newpath)
+            return res.status(200).json({ item: response, success: true, message: 'File moved successfully.' })
+        } catch (error) {
+            console.log('handleMoveFile : ' + error.message)
+            return res.status(500).json({ success: false, message: 'Something went wrong.' })
+        }
+    },
+    handleGetAllItems: async (req, res) => {
+        try {
+            const response = await folderModel.find({})
+            return res.status(200).json(response)
+        } catch (error) {
+            console.log('handleGetAllItems : ' + error.message)
         }
     },
 }

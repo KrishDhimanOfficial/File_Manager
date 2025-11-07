@@ -26,10 +26,7 @@ export const Breadcrumbs = ({ breadcrumbs, onNavigate }: BreadcrumbsProps) => {
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                            onNavigate(crumb.id)
-                            console.log(crumb.id);
-                        }}
+                        onClick={() => onNavigate(crumb.id)}
                         className="h-8"
                     >
                         {crumb.name}
