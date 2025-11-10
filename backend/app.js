@@ -28,7 +28,7 @@ app.use(helmet(
 app.use(mongoSanitize())
 app.use(cors(
   {
-    origin: [config.serverURL, 'http://localhost:5173'],
+    origin: [config.serverURL, 'http://localhost:5173', 'http://localhost:5174'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,

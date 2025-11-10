@@ -152,6 +152,12 @@ const Files = () => {
         setIsMoveDialogOpen(true);
     }
 
+    // handle copy
+    function handleCopy() {
+        const path = files.filter(f => f.type === 'file' && f.id === contextMenuTargetId)[0].path
+        navigator.clipboard.writeText(`${config.serverURL}/${path}`);
+    }
+
     // Handle confirming the move
     function handleMoveConfirm(targetFolderId: string | null) {
         const itemsToMove: string = localStorage.getItem('targetId') || '';
@@ -219,6 +225,7 @@ const Files = () => {
                 onRename={() => setIsRenameDialogOpen(true)}
                 onDelete={updateTrash}
                 onMove={handleMoveClick}
+                onCopy={handleCopy}
                 onDownload={handleDownload}
                 onView={() => {
                     const item = contextMenuTargetId

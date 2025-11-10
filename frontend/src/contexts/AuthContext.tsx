@@ -4,6 +4,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 
 interface AuthContextType {
     user: string | null
+    darkMode: boolean
+    defaultView: string
+    setDarkMode: (darkMode: boolean) => void
+    setDefaultView: (defaultView: string) => void
     login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>
     signup: (email: string, password: string, name: string) => Promise<{ success: boolean; message?: string }>
     logout: () => void
@@ -13,7 +17,7 @@ interface AuthContextType {
 
 function isTokenExpired(token: string | null): boolean {
     if (!token) return true
-    
+
     try {
         const payload = JSON.parse(atob(token.split('.')[1]))
         const currentTime = Math.floor(Date.now() / 1000)
@@ -32,6 +36,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<string | null>(null)
     const [authicated, setAuthenticated] = useState<boolean>(false)
     const [isLoading, setIsLoading] = useState(true)
+    const [darkMode, setDarkMode] = useState(false);
+    const [defaultView, setDefaultView] = useState('grid');
 
     const handleRefreshToken = async () => {
         try {
@@ -56,7 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         const storedToken = Cookies.get('fileManager_token')
-        
+
         if (storedToken) {
             if (isTokenExpired(storedToken)) {
                 handleRefreshToken().finally(() => setIsLoading(false))
@@ -99,8 +105,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await Fetch.get('/auth/logout')
     }
 
+    useEffect(() => {
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        setDarkMode(isDarkMode)
+        document.documentElement.classList.toggle('dark', isDarkMode)
+
+        setDefaultView(localStorage.getItem('defaultView') || 'grid')
+    }, [])
     return (
-        <AuthContext.Provider value={{ authicated, user, login, signup, logout, isLoading }}>
+        <AuthContext.Provider value={{ authicated, user, login, signup, logout, isLoading, darkMode, setDarkMode, defaultView, setDefaultView }}>
             {children}
         </AuthContext.Provider>
     )

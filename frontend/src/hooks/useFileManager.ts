@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { toast } from 'sonner'
 import Fetch from './Fetch'
-import { useContextMenu } from './useContextMenu'
 
 export interface FileItem {
     id: string
@@ -78,20 +77,6 @@ export const useFileManager = () => {
                 : await Fetch.get(`/folders`)
             // console.log(res)
             setFiles(res)
-
-            if (currentFolder) {
-                // const u: Array<any> = res[0]?.path.split('/')
-                // u.shift()
-                // u.pop()
-
-                // const base = u?.map((folder: any) => {
-                //     return {
-                //         name: folder,
-                //         id: res[0].parentId
-                //     }
-                // })
-                // setbreadcumbs(base)
-            }
         } catch (error) {
             console.error(error);
         }
@@ -114,6 +99,7 @@ export const useFileManager = () => {
     useEffect(() => { handleFolders() }, [currentFolder, handleFolders])
 
     const uploadFile = useCallback(async (file: File, parentId: string | null = null) => {
+
         const formData = new FormData()
         formData.append('file', file)
         const res = await Fetch.post(`/upload/data?parentId=${parentId || currentFolder}`, formData)
@@ -177,7 +163,11 @@ export const useFileManager = () => {
         setAllItems(res)
     }
 
-    useEffect(() => { handleGetAllItems() }, [])
+    useEffect(() => {
+        handleGetAllItems()
+        const view = (localStorage.getItem('defaultView') as 'grid' | 'list') || 'grid'
+        setViewMode(view)
+    }, [])
 
     useEffect(() => {
         if (!currentFolder) return setbreadcumbs([])

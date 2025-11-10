@@ -28,12 +28,7 @@ const Index = () => {
             title: 'Lightning Fast',
             description: 'Access and manage your files with incredible speed',
         },
-        {
-            icon: Cloud,
-            title: 'Cloud Sync',
-            description: 'Keep your files in sync across all devices',
-        },
-    ];
+    ]
 
     return (
         <div className="min-h-screen bg-gradient-subtle">

@@ -88,67 +88,11 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          < RouterProvider router={routes} future={{ v7_startTransition: true, }} />
+          < RouterProvider router={routes} future={{ v7_startTransition: true }} />
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
   )
-  // return <QueryClientProvider client={queryClient}>
-  //   <AuthProvider>
-  //     <TooltipProvider>
-  //       <Toaster />
-  //       <Sonner />
-  //       <BrowserRouter>
-  //         <Routes>
-  //           <Route path="/" element={<Index />} />
-  //           <Route path="/auth" element={<Auth />} />
-  //           <Route
-  //             path="/files"
-  //             element={
-  //               <ProtectedRoute>
-  //                 <FileManagerLayout>
-  //                   <Files />
-  //                 </FileManagerLayout>
-  //               </ProtectedRoute>
-  //             }
-  //           />
-  //           <Route
-  //             path="/folders"
-  //             element={
-  //               <ProtectedRoute>
-  //                 <FileManagerLayout>
-  //                   <Folders />
-  //                 </FileManagerLayout>
-  //               </ProtectedRoute>
-  //             }
-  //           />
-  //           <Route
-  //             path="/analytics"
-  //             element={
-  //               <ProtectedRoute>
-  //                 <FileManagerLayout>
-  //                   <Analytics />
-  //                 </FileManagerLayout>
-  //               </ProtectedRoute>
-  //             }
-  //           />
-  //           <Route
-  //             path="/settings"
-  //             element={
-  //               <ProtectedRoute>
-  //                 <FileManagerLayout>
-  //                   <Settings />
-  //                 </FileManagerLayout>
-  //               </ProtectedRoute>
-  //             }
-  //           />
-  //           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-  //           <Route path="*" element={<NotFound />} />
-  //         </Routes>
-  //       </BrowserRouter>
-  //     </TooltipProvider>
-  //   </AuthProvider>
-  // </QueryClientProvider>
-};
+}
 
 export default App

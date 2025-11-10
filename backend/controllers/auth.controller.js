@@ -2,7 +2,6 @@ import chalk from "chalk"
 import jwt from "../services/generateJWT.service.js"
 import adminModel from "../models/admin.model.js"
 import config from "../config/config.js"
-import bcrypt from 'bcrypt'
 import validate from '../services/validate.service.js'
 
 const authControllers = {

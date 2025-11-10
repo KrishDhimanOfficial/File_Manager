@@ -12,11 +12,11 @@ import {
 } from '@/components/ui/table';
 
 interface FileListProps {
-  items: FileItem[];
-  onItemClick: (item: FileItem) => void;
-  onItemDoubleClick?: (item: FileItem) => void;
-  onContextMenu: (e: React.MouseEvent, item: FileItem) => void;
-  selectedItems: string[];
+  items: FileItem[]
+  onItemClick: (item: FileItem) => void
+  onItemDoubleClick?: (item: FileItem) => void
+  onContextMenu: (e: React.MouseEvent, item: FileItem) => void
+  selectedItems: string[]
 }
 
 const getFileIcon = (item: FileItem) => {
@@ -30,16 +30,16 @@ const getFileIcon = (item: FileItem) => {
     case 'png':
     case 'gif':
     case 'webp':
-      return <Image className="h-5 w-5 text-primary" />;
+      return <Image className="h-5 w-5 text-primary" />
     case 'txt':
     case 'md':
     case 'doc':
     case 'docx':
-      return <FileText className="h-5 w-5 text-primary" />;
+      return <FileText className="h-5 w-5 text-primary" />
     default:
-      return <File className="h-5 w-5 text-muted-foreground" />;
+      return <File className="h-5 w-5 text-muted-foreground" />
   }
-};
+}
 
 export const FileList = ({
   items,
@@ -48,7 +48,7 @@ export const FileList = ({
   onContextMenu,
   selectedItems,
 }: FileListProps) => {
-  
+
   return (
     <div className="p-6">
       <Table>
@@ -64,7 +64,7 @@ export const FileList = ({
         </TableHeader>
         <TableBody>
           {items?.map((item, index) => {
-            const isSelected = selectedItems.includes(item.id);
+            const isSelected = selectedItems.includes(item.id)
             return (
               <motion.tr
                 key={item.id}
@@ -92,14 +92,11 @@ export const FileList = ({
                 <TableCell className="text-muted-foreground">
                   {formatDate(new Date(item.updatedAt))}
                 </TableCell>
-                <TableCell>
-                  <MoreVertical className="h-4 w-4 text-muted-foreground" />
-                </TableCell>
               </motion.tr>
-            );
+            )
           })}
         </TableBody>
       </Table>
     </div>
-  );
-};
+  )
+}

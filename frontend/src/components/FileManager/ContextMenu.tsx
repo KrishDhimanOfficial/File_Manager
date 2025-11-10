@@ -16,6 +16,7 @@ interface ContextMenuProps {
   targetId: string;
   position: { x: number; y: number };
   onClose?: () => void;
+  onCopy?: any;
   onRename?: any;
   onDelete?: () => void;
   onMove?: () => void;
@@ -40,6 +41,7 @@ export const ContextMenu = React.memo<ContextMenuProps>(({
   onRename,
   onDelete,
   onDownload,
+  onCopy,
   onMove,
   onView,
   visible = {
@@ -117,15 +119,15 @@ export const ContextMenu = React.memo<ContextMenuProps>(({
 
         {/* Copy button */}
         {
-          // visible.copy && (
-          //   <button
-          //     onClick={() => handleMenuClick(undefined)}
-          //     className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
-          //   >
-          //     <Copy className="h-4 w-4" />
-          //     <span>Copy</span>
-          //   </button>
-          // )
+          visible.copy && (
+            <button
+              onClick={() => handleMenuClick(onCopy)}
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent"
+            >
+              <Copy className="h-4 w-4" />
+              <span>Copy</span>
+            </button>
+          )
         }
 
         {/* Cut button */}
@@ -183,5 +185,5 @@ export const ContextMenu = React.memo<ContextMenuProps>(({
         }
       </div>
     </motion.div>
-  );
+  )
 })
