@@ -21,7 +21,7 @@ interface FileListProps {
 
 const getFileIcon = (item: FileItem) => {
   if (item.type === 'folder') {
-    return <FolderIcon className="h-5 w-5 text-primary" />;
+    return <FolderIcon className="h-5 w-5 text-primary" />
   }
 
   switch (item.extension) {

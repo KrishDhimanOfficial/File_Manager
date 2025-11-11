@@ -52,7 +52,7 @@ const Auth = () => {
 
     useEffect(() => {
         if (user) navigate('/files')
-    }, [])
+    }, [navigate, user])
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-accent/10 p-4">
             <div className="w-full max-w-md">
@@ -71,9 +71,9 @@ const Auth = () => {
                     </CardHeader>
                     <CardContent>
                         <Tabs defaultValue="login" className="w-full">
-                            <TabsList className="grid w-full grid-cols-2">
+                            <TabsList className="grid w-full grid-cols-1">
                                 <TabsTrigger value="login">Login</TabsTrigger>
-                                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                                {/* <TabsTrigger value="signup">Sign Up</TabsTrigger> */}
                             </TabsList>
 
                             <TabsContent value="login">
@@ -106,7 +106,7 @@ const Auth = () => {
                                 </form>
                             </TabsContent>
 
-                            <TabsContent value="signup">
+                            {/* <TabsContent value="signup">
                                 <form onSubmit={handleSignup} className="space-y-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="signup-name">Name</Label>
@@ -146,7 +146,7 @@ const Auth = () => {
                                         {isLoading ? 'Creating account...' : 'Sign Up'}
                                     </Button>
                                 </form>
-                            </TabsContent>
+                            </TabsContent> */}
                         </Tabs>
                     </CardContent>
                 </Card>

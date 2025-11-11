@@ -14,6 +14,7 @@ import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Trash from "./pages/Trash";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,16 @@ const App = () => {
           </FileManagerLayout>
         </ProtectedRoute>
       ),
+    },
+    {
+      path: "/profile",
+      element: (
+        <ProtectedRoute>
+          <FileManagerLayout>
+            <Profile />
+          </FileManagerLayout>
+        </ProtectedRoute>
+      )
     },
     {
       path: '/trash',

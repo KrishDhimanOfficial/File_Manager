@@ -18,11 +18,6 @@ const adminSchema = new mongoose.Schema({
             'Please fill a valid email address.'
         ]
     },
-    phone: {
-        type: String,
-        maxLength: [10, 'Phone number must be 10 digits long'],
-        default: null,
-    },
     password: {
         type: String,
         required: [true, 'Password is required'],

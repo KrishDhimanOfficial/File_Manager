@@ -26,7 +26,7 @@ export const FilePreviewModal = ({
           <FileText className="h-16 w-16 mb-4" />
           <p>No preview available</p>
         </div>
-      );
+      )
     }
 
     if (isImageFile(file.extension)) {
@@ -38,7 +38,7 @@ export const FilePreviewModal = ({
             className="max-w-full max-h-96 rounded-lg"
           />
         </div>
-      );
+      )
     }
 
     if (isTextFile(file.extension) && file.content) {
@@ -48,7 +48,7 @@ export const FilePreviewModal = ({
             {file.content}
           </pre>
         </div>
-      );
+      )
     }
 
     return (
@@ -56,8 +56,8 @@ export const FilePreviewModal = ({
         <FileText className="h-16 w-16 mb-4" />
         <p>Preview not available for this file type</p>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -70,5 +70,5 @@ export const FilePreviewModal = ({
         </div>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}

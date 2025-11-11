@@ -16,5 +16,5 @@ export const FileManagerLayout = ({ children }: FileManagerLayoutProps) => {
         </main>
       </div>
     </SidebarProvider>
-  );
-};
+  )
+}

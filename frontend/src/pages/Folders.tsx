@@ -6,12 +6,11 @@ import { formatDate } from '@/lib/fileUtils';
 
 const Folders = () => {
     const { files, setCurrentFolder } = useFileManager();
-
     const folders = files.filter(f => f.type === 'folder' && f.parentId === null);
 
     const getFolderItemCount = (folderId: string) => {
-        return files.filter(f => f.parentId === folderId).length;
-    };
+        return files.filter(f => f.parentId === folderId).length
+    }
 
     return (
         <div className="min-h-screen bg-gradient-subtle">

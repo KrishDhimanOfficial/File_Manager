@@ -1,6 +1,5 @@
 import {
     AlertDialog,
-    AlertDialogTrigger,
     AlertDialogContent,
     AlertDialogHeader,
     AlertDialogFooter,
@@ -13,10 +12,10 @@ import {
 interface AlertBoxProps {
     title: string
     desc: string
-    onCancel: any
-    onContinue: any
+    onCancel: () => void
+    onContinue: () => void
     open: boolean
-    onOpenChange: any
+    onOpenChange: () => void
 }
 
 const AlertBox = ({ title, desc, onCancel, onContinue, open, onOpenChange }: AlertBoxProps) => {

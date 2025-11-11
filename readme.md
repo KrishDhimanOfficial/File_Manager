@@ -1,3 +1,3 @@
 # File Manager
 
-![alt text](<Screenshot 2025-10-27 at 1.43.36 PM.png>)
+![alt text](<Screenshot 2025-11-11 at 5.35.01 PM.png>)

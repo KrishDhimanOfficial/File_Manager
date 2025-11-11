@@ -34,5 +34,5 @@ export const Breadcrumbs = ({ breadcrumbs, onNavigate }: BreadcrumbsProps) => {
                 </div>
             ))}
         </div>
-    );
+    )
 }

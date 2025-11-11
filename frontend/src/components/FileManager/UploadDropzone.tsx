@@ -54,6 +54,7 @@ export const UploadDropzone = ({ onUpload }: UploadDropzoneProps) => {
             window.removeEventListener('dragleave', handleDragLeave)
             window.removeEventListener('drop', handleDrop)
         }
+        
     }, [onUpload])
 
     return (

@@ -1,6 +1,5 @@
 import { FolderIcon } from "lucide-react"
 
-
 const FolderTree = ({ folders, parentId = null, selectedFolder, setSelectedFolder }) => {
     return (
         <div className="pl-3">

@@ -1,4 +1,4 @@
-import { Search, Grid3x3, List, FolderPlus, Upload, SlidersHorizontal } from 'lucide-react';
+import { Search, Grid3x3, List, FolderPlus, Upload, } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -74,5 +74,5 @@ export const FileToolbar = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

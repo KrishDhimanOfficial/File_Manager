@@ -21,15 +21,15 @@ export const NewFolderDialog = ({
     onClose,
     onConfirm,
 }: NewFolderDialogProps) => {
-    const [folderName, setFolderName] = useState('');
+    const [folderName, setFolderName] = useState('')
 
     const handleConfirm = () => {
         if (folderName.trim()) {
-            onConfirm(folderName.trim());
-            setFolderName('');
-            onClose();
+            onConfirm(folderName.trim())
+            setFolderName('')
+            onClose()
         }
-    };
+    }
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -64,5 +64,5 @@ export const NewFolderDialog = ({
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-    );
+    )
 }

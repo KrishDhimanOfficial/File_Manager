@@ -1,4 +1,4 @@
-import { Home, FolderOpen, Folders, Settings as SettingsIcon, HardDrive, LogOut, BarChart3 } from 'lucide-react';
+import { Home, FolderOpen, Folders, Settings as SettingsIcon, HardDrive, LogOut, BarChart3, User } from 'lucide-react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -22,9 +22,10 @@ const menuItems = [
   { title: 'Files', url: '/files', icon: FolderOpen },
   // { title: 'Folders', url: '/folders', icon: Folders },
   { title: 'Analytics', url: '/analytics', icon: BarChart3 },
+  { title: 'Profile', url: '/profile', icon: User },
   { title: 'Trash', url: '/trash', icon: FolderOpen },
   { title: 'Settings', url: '/settings', icon: SettingsIcon },
-];
+]
 
 export const FileManagerSidebar = () => {
   const { state } = useSidebar();
@@ -34,10 +35,10 @@ export const FileManagerSidebar = () => {
   const isCollapsed = state === 'collapsed';
 
   const handleLogout = () => {
-    logout();
-    toast.success('Logged out successfully');
-    navigate('/auth');
-  };
+    logout()
+    toast.success('Logged out successfully')
+    navigate('/auth')
+  }
 
   const getNavClassName = ({ isActive }: { isActive: boolean }) =>
     isActive
@@ -105,5 +106,5 @@ export const FileManagerSidebar = () => {
         </div>
       </SidebarFooter>
     </Sidebar>
-  );
-};
+  )
+}

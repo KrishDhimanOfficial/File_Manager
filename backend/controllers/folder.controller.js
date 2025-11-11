@@ -50,6 +50,7 @@ const folder_controllers = {
             fs.promises.rename(`uploads/${oldpath}`, `uploads/${newpath}`)
 
             return res.status(200).json({
+                folder: response,
                 success: true,
                 message: 'Folder renamed successfully.',
             })

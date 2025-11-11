@@ -97,8 +97,8 @@ export const FileGrid = ({
               </div>
             </Card>
           </motion.div>
-        );
+        )
       })}
     </div>
-  );
-};
+  )
+}

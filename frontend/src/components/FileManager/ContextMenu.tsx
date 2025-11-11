@@ -5,7 +5,6 @@ import {
   Edit,
   Trash2,
   Copy,
-  Scissors,
   FolderInput,
   Eye,
 } from 'lucide-react';

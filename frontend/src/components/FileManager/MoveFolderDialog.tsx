@@ -29,19 +29,19 @@ export const MoveFolderDialog = ({
     currentItemIds,
 }: MoveFolderDialogProps) => {
     // Which folder is selected (null means root folder)
-    const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+    const [selectedFolder, setSelectedFolder] = useState<string | null>(null)
 
     // Reset selection when dialog closes
     useEffect(() => {
         if (!isOpen) {
-            setSelectedFolder(null);
+            setSelectedFolder(null)
         }
-    }, [isOpen]);
+    }, [isOpen])
 
     // Handle clicking the "Move Here" button
     function handleMoveClick() {
-        onConfirm(selectedFolder);
-        onClose();
+        onConfirm(selectedFolder)
+        onClose()
     }
 
     // Filter out folders that user is trying to move
@@ -118,5 +118,5 @@ export const MoveFolderDialog = ({
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-    );
+    )
 }

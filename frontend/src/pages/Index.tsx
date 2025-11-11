@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
-import { HardDrive, FolderOpen, Upload, Shield, Zap, Cloud } from 'lucide-react';
+import { HardDrive, FolderOpen, Upload, Shield, Zap} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card,  CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-    const navigate = useNavigate();
+    const navigate = useNavigate()
 
     const features = [
         {
@@ -116,7 +116,7 @@ const Index = () => {
                 </motion.div>
             </div>
         </div>
-    );
-};
+    )
+}
 
 export default Index

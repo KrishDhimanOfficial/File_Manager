@@ -118,7 +118,7 @@ export const useFileManager = () => {
 
         setFiles(prev => prev.map(f =>
             f.id === itemId
-                ? { ...f, name: res.name }
+                ? { ...f, name: res.folder?.name }
                 : f
         ))
         if (!res.success) {

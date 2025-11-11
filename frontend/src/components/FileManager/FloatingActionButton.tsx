@@ -17,7 +17,7 @@ export const FloatingActionButton = ({
   const actions = [
     { icon: FolderPlus, label: 'New Folder', action: onNewFolder },
     { icon: Upload, label: 'Upload File', action: onUpload },
-  ];
+  ]
 
   return (
     <div className="fixed bottom-8 right-8 z-40">
@@ -67,5 +67,5 @@ export const FloatingActionButton = ({
         </motion.div>
       </Button>
     </div>
-  );
-};
+  )
+}

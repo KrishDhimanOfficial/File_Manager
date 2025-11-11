@@ -48,21 +48,9 @@ const Trash = () => {
         queryFn: async () => await Fetch.get(`/trash/folders`),
     })
     const [targetId, setTargetId] = useState<string | null>(null)
-    const [previewFile, setPreviewFile] = useState<FileItem | null>(null)
     const [isAlertOpen, setIsAlertOpen] = useState(false)
     const [isNewFolderDialogOpen, setIsNewFolderDialogOpen] = useState(false)
-    const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
-
-    const currentItems = getItemsByFolder(currentFolder, { isTrash: true })
-
-    const filteredItems = searchQuery
-        ? currentItems.filter(item =>
-            item.name.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        : currentItems;
-
-    // const breadcrumbs = getBreadcrumbs(currentFolder);
 
     // Handle clicking on an item (select/deselect)
     function handleItemClick(item: FileItem) {
@@ -108,57 +96,11 @@ const Trash = () => {
         }
     }
 
-    // Handle dropping files
-    // function handleFileDrop(files: File[]) {
-    //     for (let i = 0; i < files.length; i++) {
-    //         uploadFile(files[i]);
-    //     }
-    // }
-
     async function restoredTrash() {
         targetId && trashItems(targetId, false)
         refetch()
         return
     }
-
-    // Handle rename button click
-    // function handleRename() {
-    //     let itemId = contextMenuTargetId;
-    //     if (!itemId && selectedItems.length > 0) {
-    //         itemId = selectedItems[0];
-    //     }
-
-    //     if (itemId) {
-    //         const newName = prompt('Enter new name:');
-    //         if (newName) {
-    //             renameItem(itemId, newName);
-    //         }
-    //     }
-    // }
-
-    // Handle move button click
-    // function handleMoveClick() {
-    //     setIsMoveDialogOpen(true);
-    // }
-
-    // // Handle confirming the move
-    // function handleMoveConfirm(targetFolderId: string | null) {
-    //     let itemsToMove: string[] = [];
-
-    //     if (contextMenuTargetId) {
-    //         itemsToMove = [contextMenuTargetId];
-    //     } else {
-    //         itemsToMove = selectedItems;
-    //     }
-
-    //     if (itemsToMove.length > 0) {
-    //         moveItems(itemsToMove, targetFolderId);
-    //         setSelectedItems([]);
-    //     }
-    // }
-
-    // // // Get all folders for the move dialog
-    // const allFolders = files.filter(item => item.type === 'folder');
 
     return (
         <div className="flex flex-col h-screen" onDragOver={(e) => e.preventDefault()}>
@@ -209,50 +151,10 @@ const Trash = () => {
                 )}
             </div>
 
-            {/* <ContextMenu
-                isOpen={isContextMenuOpen}
-                visible={{ delete: true }}
-                position={contextMenuPosition}
-                onClose={closeMenu}
-                // onRename={handleRename}
-                onDelete={updateTrash}
-                // onMove={handleMoveClick}
-                onView={() => {
-                    const item = contextMenuTargetId
-                        ? currentItems.find(i => i.id === contextMenuTargetId)
-                        : null;
-                    if (item?.type === 'file') {
-                        setPreviewFile(item);
-                    }
-                }}
-            /> */}
-            {/* 
-            <FilePreviewModal
-                file={previewFile}
-                isOpen={!!previewFile}
-                onClose={() => setPreviewFile(null)}
-            />
-
-            <NewFolderDialog
-                isOpen={isNewFolderDialogOpen}
-                onClose={() => setIsNewFolderDialogOpen(false)}
-                onConfirm={createFolder}
-            />
-
-            <MoveFolderDialog
-                isOpen={isMoveDialogOpen}
-                onClose={() => setIsMoveDialogOpen(false)}
-                onConfirm={handleMoveConfirm}
-                folders={allFolders}
-                currentItemIds={contextMenuTargetId ? [contextMenuTargetId] : selectedItems}
-            />
-
-            <UploadDropzone onUpload={handleFileDrop} /> */}
-
-            <FloatingActionButton
+            {/* <FloatingActionButton
                 onNewFolder={() => setIsNewFolderDialogOpen(true)}
                 onUpload={handleUpload}
-            />
+            /> */}
 
             <input
                 ref={fileInputRef}
